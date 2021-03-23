@@ -1,38 +1,192 @@
-.App {
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Syne+Tactile&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap");
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: content-box;
+}
+::-webkit-scrollbar {
+  display: none;
+}
+.mainContainer {
+  width: 25vw;
+  position: relative;
+  float: right;
+  margin-right: 10px;
+}
+.container {
+  clear: right;
+  margin-top: 15px;
+}
+.toggleButtonOff {
+  float: right;
+  height: 15px;
+  background-color: black;
+  border-radius: 7px;
+  width: 15px;
+  border-color: grey;
+}
+.toggleButtonOn {
+  float: right;
+  height: 15px;
+  background-color: green;
+  border-radius: 7px;
+  width: 15px;
+  border-color: grey;
+}
+.header {
+  border-radius: 14px;
+  background-color: rgb(0, 0, 0, 0.3);
+
+  font-family: "Quicksand", sans-serif;
+  font-size: 24px;
+
+  color: blanchedalmond;
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.footer {
+  margin-top: 1px;
+  border-radius: 14px;
+  background-color: rgb(0, 0, 0, 0.3);
+  font-family: "Quicksand", sans-serif;
+  font-size: 15;
+  color: blanchedalmond;
+  text-align: center;
 }
+.goalBorder {
+  background-color: black;
+  height: 30px;
+  margin-top: 2px;
+  border-radius: 3px;
+  width: 80%;
+  text-align: start;
+  color: blanchedalmond;
+  font-family: "Quicksand", sans-serif;
+  font-size: 20px;
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+  padding-left: 10px;
 }
+.goalFill {
+  background-color: rgb(0, 153, 0);
+  height: 30px;
+  margin-top: -30px;
+  border-radius: 3px;
+}
+.goalText {
+  text-align: end;
+  color: blanchedalmond;
+  font-family: "Quicksand", sans-serif;
+  font-size: 20px;
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+  margin-top: -30px;
+  width: 75%;
+}
+.goalAdd {
+  height: 30px;
+  float: right;
+  margin-right: 20px;
+  margin-top: -30px;
+}
+.request {
+  color: blanchedalmond;
+  text-align: left;
+  font-family: "Titillium Web";
+  padding-left: 10px;
+  font-size: 18px;
+  background-color: rgb(0, 0, 0, 0.3);
+  border-radius: 14px;
+  height: 28px;
+  margin-top: 1px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+}
+#id1.request {
+  font-size: 24px;
+  height: 38px;
+  width: 100%;
+}
+.icon {
+  height: 20px;
+  margin-top: -4px;
+}
+.requestListTimer {
   color: white;
+  font-size: 24px;
+  font-family: "Titillium Web";
+  position: absolute;
+  margin-left: 14px;
 }
-
-.App-link {
-  color: #61dafb;
+.redemption {
+  border: transparent;
+  font-size: 24px;
+  font-family: "Quicksand", sans-serif;
+  background-color: purple;
+  padding-left: 10px;
 }
+.redemption:hover {
+  font-size: 30px;
+}
+.storeFooter {
+  font-family: "Quicksand", sans-serif;
+  text-align: center;
+  border: 1px solid black;
+  border-radius: 14px;
+  font-size: 20px;
+}
+.storeHeader {
+  font-family: "Quicksand", sans-serif;
+  text-align: center;
+  font-size: 30px;
+  background-color: orange;
+  border-radius: 14px;
+}
+#store.container {
+  background-color: purple;
+  border-radius: 14px;
+  padding-left: 0px;
+  padding-right: 0px;
+  text-align: center;
+}
+#requestList.container {
+  padding-right: 0px;
+  padding-left: 0px;
+}
+#goals.container {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+.backButton {
+  right: 0px;
+  position: absolute;
+  height: 40px;
+  width: 50px;
+  border-radius: 14px;
+  font-size: 50px;
+  text-align: center;
+}
+.backButtonText {
+  margin-top: -25px;
+}
+.redemptionLabel {
+  font-family: "Quicksand", sans-serif;
+  text-align: center;
+  font-size: 30px;
+}
+.redemptionInput {
+  width: 50%;
+}
+.redemptionButton {
+  font-size: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border-radius: 14px;
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  height: 35px;
+  width: 50%;
+}
+.redemptionInfo {
+  width: 100%;
 }

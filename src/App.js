@@ -59,16 +59,21 @@ class App extends Component {
       this.setState({ redemptions: res.data })
     })
   }
-  handleGoalsUpdate = (goal) => {
+  handleGoalsUpdate = (goalObject) => {
     Axios({
       method: "post",
       url: API + "/goals/update",
-      data: [{ goal: goal.goal }, { username: this.state.user }],
+      data: [{ goal: goalObject.goal }, { username: this.state.user }],
     }).then((res) => {
       console.log(res)
       if (res.statusText === "OK") {
+        this.setState((prevState) => {
+          let goals = [...prevState.goals]
+          let updateGoal = goals.find(({ goal }) => goal === goalObject.goal)
+          updateGoal.current = updateGoal.current + 0.5
+          return { goals }
+        })
         this.setState({ currency: this.state.currency - 1 })
-        this.getGoals()
       }
     })
   }
@@ -83,18 +88,26 @@ class App extends Component {
     }).then((res) => {
       console.log(res)
       if (res.statusText === "OK") {
+        this.setState((prevState) => {
+          let requests = [...prevState.requests]
+          requests.push({
+            name: this.state.user,
+            type: type,
+            message: message,
+            id: requests.length + 1,
+          })
+          return {
+            requests,
+          }
+        })
         this.setState({ currency: this.state.currency - cost })
-        this.getRequests()
       }
     })
   }
   copyToClipboard = (e) => {
     this.textArea.select()
     document.execCommand("copy")
-    // This is just personal preference.
-    // I prefer to not show the whole text area selected.
     e.target.focus()
-    this.setState({ copySuccess: "Copied!" })
   }
   handleSignup = (username, password) => {
     let number = Math.random() * (100000000000000000 - 0)
@@ -108,7 +121,8 @@ class App extends Component {
         string: number,
       },
     }).then((res) => {
-      if (res.data === "success") {
+      console.log(res.data)
+      if (res.data === "sign up success") {
         this.setState({
           signupString: (
             <div>
@@ -146,13 +160,32 @@ class App extends Component {
       url: API + "/users",
       data: { username: username, password: password },
     }).then((res) => {
-      console.log(res.data[0].cbucks)
-      if (res.data.length === 1) {
-        this.setState({ user: username, currency: res.data[0].currency })
+      console.log(res.data)
+      if (res.data !== null) {
+        if (res.data === "wrong password") {
+          this.setState({ signupString: "wrong password buddy" })
+        } else if (res.data.status === "verified") {
+          this.setState({ user: username, currency: res.data.currency })
+        } else {
+          this.setState({
+            signupString:
+              "user not verified, sign up and use code to verify your account",
+          })
+        }
+      } else {
+        this.setState({ signupString: "user not found, just sign up" })
       }
     })
   }
-
+  handleForgotPassword = (username, password) => {
+    Axios({
+      method: "post",
+      url: API + "/users/forgotpassword",
+      data: { username: username, password: password },
+    }).then((res) => {
+      this.setState({ signupString: res.data })
+    })
+  }
   state = {
     requests: [],
     goals: [],
@@ -162,13 +195,16 @@ class App extends Component {
     signupString: "",
   }
   render() {
-    console.log(this.state)
     const renderLogin = () => {
       if (this.state.user === "") {
         return (
           <div className="loginContainer">
-            <Login onSignup={this.handleSignup} onLogin={this.handleLogin} />
-            <p>{this.state.signupString}</p>
+            <Login
+              onSignup={this.handleSignup}
+              onLogin={this.handleLogin}
+              onForgotPassword={this.handleForgotPassword}
+            />
+            {this.state.signupString}
           </div>
         )
       }

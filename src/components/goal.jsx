@@ -2,16 +2,14 @@ import React, { Component } from "react"
 
 class Goal extends Component {
   handleCbucksAdd = () => {
-    {
-      if (this.props.currency > 0) {
-        this.props.onCbucksAdd(this.props.goal)
-      }
+    if (this.props.currency > 0) {
+      this.props.onCbucksAdd(this.props.goal)
     }
   }
 
   render() {
     const renderAddCbucksButton = () => {
-      if (this.props.currency != "") {
+      if (this.props.currency !== "") {
         return (
           <button className="goalAdd" onClick={this.handleCbucksAdd}>
             Add 1 cbuck

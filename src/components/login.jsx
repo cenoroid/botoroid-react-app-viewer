@@ -2,7 +2,7 @@ import React, { Component } from "react"
 class Login extends Component {
   constructor(props) {
     super(props)
-    this.state = { username: "", password: "", showPassword: false }
+    this.state = { username: "", password: "", showPassword: false, text: "" }
     this.handleChangeUsername = this.handleChangeUsername.bind(this)
     this.handleChangePassword = this.handleChangePassword.bind(this)
     this.handleType = this.handleType.bind(this)
@@ -24,9 +24,20 @@ class Login extends Component {
       return "text"
     } else return "password"
   }
+  handleForgotPassword = () => {
+    if (this.state.username === "" || this.state.password === "") {
+      this.setState({
+        text: "Please enter your username and new password, then click again",
+      })
+    } else {
+      this.props.onForgotPassword(this.state.username, this.state.password)
+      this.setState({
+        text: "",
+      })
+    }
+  }
   state = {}
   render() {
-    console.log(this.passwordState())
     return (
       <div>
         <p>Twitch Username</p>
@@ -60,6 +71,8 @@ class Login extends Component {
         >
           Sign Up
         </button>
+        <button onClick={this.handleForgotPassword}>Forgot Password</button>
+        <p>{this.state.text}</p>
       </div>
     )
   }

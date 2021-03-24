@@ -6,8 +6,8 @@ import StoreContainer from "./components/storeContainer"
 import dotenv from "dotenv"
 import Login from "./components/login"
 import "./App.css"
-//const API = process.env.REACT_APP_API
-const API = "http://localhost:4000"
+const API = process.env.REACT_APP_API
+//const API = "http://localhost:4000"
 class App extends Component {
   componentDidMount() {
     dotenv.config()
@@ -27,8 +27,6 @@ class App extends Component {
       method: "get",
       url: API + "/requests",
     }).then((res) => {
-      console.log("get requests")
-
       for (let index = 0; index < res.data.length; index++) {
         res.data[index].id = index + 1
       }
@@ -65,7 +63,6 @@ class App extends Component {
       url: API + "/goals/update",
       data: [{ goal: goalObject.goal }, { username: this.state.user }],
     }).then((res) => {
-      console.log(res)
       if (res.statusText === "OK") {
         this.setState((prevState) => {
           let goals = [...prevState.goals]
@@ -86,7 +83,6 @@ class App extends Component {
         { user: this.state.user, value: cost },
       ],
     }).then((res) => {
-      console.log(res)
       if (res.statusText === "OK") {
         this.setState((prevState) => {
           let requests = [...prevState.requests]
@@ -121,7 +117,6 @@ class App extends Component {
         string: number,
       },
     }).then((res) => {
-      console.log(res.data)
       if (res.data === "sign up success") {
         this.setState({
           signupString: (
@@ -160,7 +155,6 @@ class App extends Component {
       url: API + "/users",
       data: { username: username, password: password },
     }).then((res) => {
-      console.log(res.data)
       if (res.data !== null) {
         if (res.data === "wrong password") {
           this.setState({ signupString: "wrong password buddy" })

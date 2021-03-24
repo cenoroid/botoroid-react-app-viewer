@@ -190,3 +190,9 @@
 .redemptionInfo {
   width: 100%;
 }
+.loginContainer {
+  position: absolute;
+  margin-left: 10px;
+  margin-top: 10px;
+  width: 30vw;
+}

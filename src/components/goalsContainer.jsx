@@ -27,6 +27,7 @@ class GoalsContainer extends Component {
                 key={goal.id}
                 goal={goal}
                 onCbucksAdd={() => this.props.onCbucksAdd(goal)}
+                currency={this.props.currency}
               />
             ))}
           </div>

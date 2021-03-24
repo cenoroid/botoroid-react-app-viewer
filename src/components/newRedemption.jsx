@@ -49,6 +49,12 @@ class NewRedemption extends Component {
   }
 
   redemptionText = this.defineText()
+  handleNewSubmit = () => {
+    if (this.props.currency >= this.props.newRedemption.cost) {
+      this.props.onNewSubmit(this.state.value, this.props.newRedemption.cost)
+      this.props.onRedeem(null)
+    }
+  }
   render() {
     return (
       <div>
@@ -67,14 +73,8 @@ class NewRedemption extends Component {
           onChange={this.handleChange}
         />
         <div className="redemptionInfo">{this.redemptionText[1]}</div>
-        <button
-          className="redemptionButton"
-          onClick={() => {
-            this.props.onNewSubmit(this.state.value)
-            this.props.onRedeem(null)
-          }}
-        >
-          <p>"redeem for " + {this.props.newRedemption.cost}</p>
+        <button className="redemptionButton" onClick={this.handleNewSubmit}>
+          <p>redeem for {this.props.newRedemption.cost}</p>
         </button>
       </div>
     )

@@ -1,7 +1,25 @@
 import React, { Component } from "react"
 
 class Goal extends Component {
+  handleCbucksAdd = () => {
+    {
+      if (this.props.currency > 0) {
+        this.props.onCbucksAdd(this.props.goal)
+      }
+    }
+  }
+
   render() {
+    const renderAddCbucksButton = () => {
+      if (this.props.currency != "") {
+        return (
+          <button className="goalAdd" onClick={this.handleCbucksAdd}>
+            Add 1 cbuck
+          </button>
+        )
+      }
+    }
+
     return (
       <div>
         <div className="goalBorder">{this.props.goal.goal}</div>
@@ -14,12 +32,8 @@ class Goal extends Component {
         <div className="goalText">
           {this.props.goal.current} /{this.props.goal.end}
         </div>
-        <button
-          className="goalAdd"
-          onClick={() => this.props.onCbucksAdd(this.props.goal)}
-        >
-          Add 1 cbuck
-        </button>
+
+        {renderAddCbucksButton()}
       </div>
     )
   }

@@ -21,16 +21,19 @@ class StoreContainer extends Component {
   state = {
     show: 1,
     newRedemption: null,
-    user: "Cenoroid",
-    currency: 1000000,
   }
   render() {
     if (this.state.newRedemption !== null) {
       return (
         <NewRedemption
+          currency={this.props.currency}
           newRedemption={this.state.newRedemption}
-          onNewSubmit={(value) =>
-            this.props.onNewSubmit(value, this.state.newRedemption.type)
+          onNewSubmit={(message) =>
+            this.props.onNewSubmit(
+              message,
+              this.state.newRedemption.type,
+              this.state.newRedemption.cost
+            )
           }
           onRedeem={this.handleRedeem}
         />
@@ -49,8 +52,8 @@ class StoreContainer extends Component {
               />
             ))}
             <StoreFooter
-              user={this.state.user}
-              currency={this.state.currency}
+              user={this.props.user}
+              currency={this.props.currency}
             />
           </div>
         )

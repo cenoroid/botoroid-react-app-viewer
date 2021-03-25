@@ -8,8 +8,8 @@ import dotenv from "dotenv"
 import Login from "./components/login"
 import "./App.css"
 
-//const API = process.env.REACT_APP_API
-const API = "http://localhost:4000"
+const API = process.env.REACT_APP_API
+//const API = "http://localhost:4000"
 class App extends Component {
   componentDidMount() {
     dotenv.config()

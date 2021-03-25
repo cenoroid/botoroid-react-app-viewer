@@ -3,15 +3,20 @@ const MongoClient = require("mongodb").MongoClient
 const MONGODB_URI =
   "mongodb+srv://cenoroid:hiph0phop@cluster0.dppsc.mongodb.net/botoroid?retryWrites=true&w=majority"
 let cachedDb = null
-function connectToDatabase(uri) {
+const client = new MongoClient(MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  connectTimeoutMS: 30000,
+})
+function connectToDatabase() {
   console.log("=> connect to database")
   if (cachedDb) {
     console.log("=> using cached database instance")
     return Promise.resolve(cachedDb)
   }
 
-  return MongoClient.connect(uri).then(() => {
-    cachedDb = MongoClient.db("botoroid")
+  return client.connect().then(() => {
+    cachedDb = client.db("botoroid")
     return cachedDb
   })
 }

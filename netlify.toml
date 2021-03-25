@@ -1,5 +1,5 @@
 [build]
-base='/'
-publish='public/'
-command='react-scripts build'
-functions='functions'
+    base="/"
+    publish="public/"
+    command="npm run build"
+    functions="functions"

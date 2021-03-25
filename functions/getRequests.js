@@ -9,8 +9,9 @@ function connectToDatabase(uri) {
     console.log("=> using cached database instance")
     return Promise.resolve(cachedDb)
   }
-  return MongoClient.connect(uri).then((db) => {
-    cachedDb = db
+
+  return MongoClient.connect(uri).then(() => {
+    cachedDb = MongoClient.db("botoroid")
     return cachedDb
   })
 }

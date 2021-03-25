@@ -24,14 +24,10 @@ function getRequests(db) {
   console.log("=> get requests")
   return db
     .collection("requests")
-    .find(
-      {},
-      {
-        projection: { _id: 0 },
-      }
-    )
+    .find({})
     .toArray()
     .then((result) => {
+      result = JSON.stringify(result)
       return { statusCode: 200, body: result }
     })
     .catch((err) => {
@@ -42,7 +38,7 @@ function getRequests(db) {
 module.exports.handler = (event, context, callback) => {
   context.callbackWaitsForEmptyEventLoop = false
   console.log("event: ", event)
-  connectToDatabase(MONGODB_URI)
+  connectToDatabase()
     .then((db) => getRequests(db))
     .then((result) => {
       console.log("=> returning result: ", result)

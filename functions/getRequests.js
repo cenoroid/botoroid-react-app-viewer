@@ -27,7 +27,9 @@ function getRequests(db) {
     .find({})
     .toArray()
     .then((result) => {
+      console.log(result)
       result = JSON.stringify(result)
+      console.log(result)
       return { statusCode: 200, body: result }
     })
     .catch((err) => {

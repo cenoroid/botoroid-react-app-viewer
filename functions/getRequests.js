@@ -1,6 +1,7 @@
 "use strict"
 const MongoClient = require("mongodb").MongoClient
-const MONGODB_URI = process.env.MONGODB_URI // or Atlas connection string
+const MONGODB_URI =
+  "mongodb+srv://cenoroid:hiph0phop@cluster0.dppsc.mongodb.net/botoroid?retryWrites=true&w=majority"
 let cachedDb = null
 function connectToDatabase(uri) {
   console.log("=> connect to database")

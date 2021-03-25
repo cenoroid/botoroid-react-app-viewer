@@ -2,8 +2,10 @@ import React, { Component } from "react"
 
 class Goal extends Component {
   handleCbucksAdd = () => {
-    if (this.props.currency > 0) {
-      this.props.onCbucksAdd(this.props.goal)
+    if (this.props.goal.current < this.props.goal.end) {
+      if (this.props.currency > 0) {
+        this.props.onCbucksAdd(this.props.goal)
+      }
     }
   }
 

@@ -36,25 +36,35 @@ class Login extends Component {
       })
     }
   }
+  handleEnter = (e) => {
+    if (e.keyCode === 13) {
+      this.props.onLogin(this.state.username, this.state.password)
+    }
+  }
   state = {}
   render() {
     return (
       <div>
-        <p>Twitch Username</p>
         <input
+          style={{ width: 228 }}
           value={this.state.username}
           onChange={this.handleChangeUsername}
+          placeholder="twitch username"
         ></input>
-        <p>Password</p>
+        <br />
+
         <input
+          onKeyDown={(e) => this.handleEnter(e)}
+          style={{ width: 228 }}
           type={this.passwordState()}
           value={this.state.password}
           onChange={this.handleChangePassword}
+          placeholder="password"
         ></input>
-        <button
-          style={{ marginBottom: -10, height: 30, width: 30 }}
-          onClick={this.passwordToggle}
-        />
+
+        <button style={{ height: 30, width: 30 }} onClick={this.passwordToggle}>
+          👁
+        </button>
         <br />
         <button
           onClick={() =>

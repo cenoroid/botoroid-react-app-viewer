@@ -6,13 +6,14 @@
   padding: 0;
   box-sizing: content-box;
 }
+
 ::-webkit-scrollbar {
   display: none;
 }
 .mainContainer {
   width: 25vw;
   position: relative;
-  float: right;
+
   margin-right: 10px;
 }
 .container {
@@ -192,7 +193,11 @@
 }
 .loginContainer {
   position: absolute;
-  margin-left: 10px;
+  left: 45%;
   margin-top: 10px;
-  width: 30vw;
+  background-color: slategray;
+  padding: 10px;
+  padding-left: 40px;
+  padding-bottom: 0px;
+  border-radius: 120px;
 }

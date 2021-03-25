@@ -1,13 +1,15 @@
 import React, { Component } from "react"
 import Axios from "axios"
+
 import RequestContainer from "./components/requestContainer"
 import GoalsContainer from "./components/goalsContainer"
 import StoreContainer from "./components/storeContainer"
 import dotenv from "dotenv"
 import Login from "./components/login"
 import "./App.css"
-const API = process.env.REACT_APP_API
-//const API = "http://localhost:4000"
+
+//const API = process.env.REACT_APP_API
+const API = "http://localhost:4000"
 class App extends Component {
   componentDidMount() {
     dotenv.config()
@@ -15,6 +17,7 @@ class App extends Component {
     this.getGoals()
     this.getRedemptions()
   }
+
   getRequests = () => {
     //Axios({
     //   method: "get",
@@ -58,23 +61,33 @@ class App extends Component {
     })
   }
   handleGoalsUpdate = (goalObject) => {
+    this.setState((prevState) => {
+      let goals = [...prevState.goals]
+      let updateGoal = goals.find(({ goal }) => goal === goalObject.goal)
+      updateGoal.current = updateGoal.current + 1
+      return { goals }
+    })
+    this.setState({ currency: this.state.currency - 1 })
     Axios({
       method: "post",
       url: API + "/goals/update",
       data: [{ goal: goalObject.goal }, { username: this.state.user }],
-    }).then((res) => {
-      if (res.statusText === "OK") {
-        this.setState((prevState) => {
-          let goals = [...prevState.goals]
-          let updateGoal = goals.find(({ goal }) => goal === goalObject.goal)
-          updateGoal.current = updateGoal.current + 0.5
-          return { goals }
-        })
-        this.setState({ currency: this.state.currency - 1 })
-      }
     })
   }
   handleSubmit = (message, type, cost) => {
+    this.setState((prevState) => {
+      let requests = [...prevState.requests]
+      requests.push({
+        name: this.state.user,
+        type: type,
+        message: message,
+        id: requests.length + 1,
+      })
+      return {
+        requests,
+      }
+    })
+    this.setState({ currency: this.state.currency - cost })
     Axios({
       method: "post",
       url: API + "/requests/add",
@@ -82,22 +95,6 @@ class App extends Component {
         { name: this.state.user, type: type, message: message },
         { user: this.state.user, value: cost },
       ],
-    }).then((res) => {
-      if (res.statusText === "OK") {
-        this.setState((prevState) => {
-          let requests = [...prevState.requests]
-          requests.push({
-            name: this.state.user,
-            type: type,
-            message: message,
-            id: requests.length + 1,
-          })
-          return {
-            requests,
-          }
-        })
-        this.setState({ currency: this.state.currency - cost })
-      }
     })
   }
   copyToClipboard = (e) => {
@@ -180,6 +177,14 @@ class App extends Component {
       this.setState({ signupString: res.data })
     })
   }
+
+  handleChangeSides = () => {
+    if (this.state.mainPosition === "left") {
+      this.setState({ mainPosition: "right" })
+    } else {
+      this.setState({ mainPosition: "left" })
+    }
+  }
   state = {
     requests: [],
     goals: [],
@@ -187,6 +192,7 @@ class App extends Component {
     user: "",
     currency: "",
     signupString: "",
+    mainPosition: "left",
   }
   render() {
     const renderLogin = () => {
@@ -204,9 +210,18 @@ class App extends Component {
       }
     }
     return (
-      <div>
+      <div
+        style={{
+          height: "100vw",
+          width: "100vw",
+          backgroundColor: "rgb(47,79,79)",
+        }}
+      >
         {renderLogin()}
-        <div className="mainContainer">
+        <div
+          className="mainContainer"
+          style={{ float: this.state.mainPosition }}
+        >
           <div className="container" id="requestList">
             <RequestContainer requests={this.state.requests} />
           </div>
@@ -225,6 +240,12 @@ class App extends Component {
               user={this.state.user}
             />
           </div>
+          <button
+            onClick={this.handleChangeSides}
+            style={{ height: 30, width: 30, float: this.state.mainPosition }}
+          >
+            ↔
+          </button>
         </div>
       </div>
     )

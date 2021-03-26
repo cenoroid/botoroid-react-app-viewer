@@ -24,7 +24,7 @@ function getRequests(db) {
   console.log("=> get requests")
   return db
     .collection("requests")
-    .find({})
+    .find({}, { projection: { _id: 0 } })
     .toArray()
     .then((result) => {
       console.log(result)

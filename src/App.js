@@ -28,7 +28,8 @@ class App extends Component {
     // })
     Axios({
       method: "get",
-      url: API + "/requests",
+      url:
+        "https://botoroid-viewer-ui.netlify.app/.netlify/functions/getRequests",
     }).then((res) => {
       for (let index = 0; index < res.data.length; index++) {
         res.data[index].id = index + 1

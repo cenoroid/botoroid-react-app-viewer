@@ -59,7 +59,7 @@ class Login extends Component {
           type={this.passwordState()}
           value={this.state.password}
           onChange={this.handleChangePassword}
-          placeholder="password"
+          placeholder="any password"
         ></input>
 
         <button style={{ height: 30, width: 30 }} onClick={this.passwordToggle}>

@@ -1,18 +1,17 @@
 import React, { Component } from "react"
 
 class ToggleButton extends Component {
-  defineButtonClass = () => {
+  buttonText = () => {
     if (this.props.status === 0) {
-      return "toggleButtonOff"
+      return "🗖"
     }
-    return "toggleButtonOn"
+    return "🗕"
   }
   render() {
     return (
-      <button
-        className={this.defineButtonClass()}
-        onClick={this.props.onToggle}
-      />
+      <button className="toggleButton" onClick={this.props.onToggle}>
+        {this.buttonText()}
+      </button>
     )
   }
 }

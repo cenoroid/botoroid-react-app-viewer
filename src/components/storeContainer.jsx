@@ -43,7 +43,6 @@ class StoreContainer extends Component {
       if (this.state.show === 1) {
         return (
           <div className="storeContainer">
-            <StoreHeader />
             {this.props.redemptions.map((redemption) => (
               <StoreRedemption
                 key={redemption.id}
@@ -62,6 +61,7 @@ class StoreContainer extends Component {
     return (
       <div>
         <ToggleButton status={this.state.show} onToggle={this.handleToggle} />
+        <StoreHeader />
         {renderPage()}
       </div>
     )

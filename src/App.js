@@ -1,121 +1,65 @@
-import React, { Component } from "react"
-import Axios from "axios"
-
-import RequestContainer from "./components/requestContainer"
-import GoalsContainer from "./components/goalsContainer"
-import StoreContainer from "./components/storeContainer"
-import dotenv from "dotenv"
-import Login from "./components/login"
-import "./App.css"
-
-const API = process.env.REACT_APP_API
-//const API = "http://localhost:4000"
+import React, { Component } from "react";
+import io from "socket.io-client";
+import RequestContainer from "./components/requestContainer";
+import GoalsContainer from "./components/goalsContainer";
+import StoreContainer from "./components/storeContainer";
+import dotenv from "dotenv";
+import Login from "./components/login";
+import Settings from "./components/settings";
+import "./App.css";
+const socket = io("https://botoroid-express-app.herokuapp.com/");
 class App extends Component {
+  constructor(props) {
+    super(props);
+    this.handleChange = this.handleChange.bind(this);
+    this.handleType = this.handleType.bind(this);
+  }
+  handleChange(event) {
+    this.setState({ newbgColor: event.target.value });
+  }
+  handleType(event) {
+    event.preventDefault();
+  }
+  handleNewbgColor = (newbgColor) => {
+    if (!newbgColor.includes("rgb")) {
+      newbgColor = "rgb" + newbgColor;
+    }
+    this.setState({ bgColor: newbgColor });
+  };
   componentDidMount() {
-    dotenv.config()
-    this.getRequests()
-    this.getGoals()
-    this.getRedemptions()
+    dotenv.config();
+    this.getRequests();
+    this.getGoals();
+    this.getRedemptions();
+    this.connectToServer();
+    this.listenToServer();
   }
+  connectToServer = () => {
+    socket.on("connection");
+  };
 
-  getRequests = () => {
-    //Axios({
-    //   method: "get",
-    //   url: "http://localhost:4000/requestListTimer",
-    // }).then((res) => {
-    //  let timer = res.data
-    //  this.setState({ timer: timer })
-    // })
-    Axios({
-      method: "get",
-      url:
-        "https://botoroid-viewer-ui.netlify.app/.netlify/functions/getRequests",
-    }).then((res) => {
-      for (let index = 0; index < res.data.length; index++) {
-        res.data[index].id = index + 1
+  emitToServer = (type, data) => {
+    socket.emit(type, data);
+  };
+  listenToServer = () => {
+    socket.on("getrequests", (data) => {
+      console.log(data);
+      this.setState({ requests: data });
+    });
+    socket.on("getgoals", (data) => {
+      for (let index = 0; index < data.length; index++) {
+        data[index].id = index + 1;
       }
-
-      this.setState({ requests: res.data })
-    })
-  }
-
-  getGoals = () => {
-    Axios({
-      method: "get",
-      url: API + "/goals",
-    }).then((res) => {
-      for (let index = 0; index < res.data.length; index++) {
-        res.data[index].id = index + 1
+      this.setState({ goals: data });
+    });
+    socket.on("getredemptions", (data) => {
+      for (let index = 0; index < data.length; index++) {
+        data[index].id = index + 1;
       }
-      this.setState({ goals: res.data })
-    })
-  }
-  getRedemptions = () => {
-    Axios({
-      method: "get",
-      url: API + "/redemptions",
-    }).then((res) => {
-      for (let index = 0; index < res.data.length; index++) {
-        res.data[index].id = index + 1
-      }
-      this.setState({ redemptions: res.data })
-    })
-  }
-  handleGoalsUpdate = (goalObject) => {
-    this.setState((prevState) => {
-      let goals = [...prevState.goals]
-      let updateGoal = goals.find(({ goal }) => goal === goalObject.goal)
-      updateGoal.current = updateGoal.current + 1
-      return { goals }
-    })
-    this.setState({ currency: this.state.currency - 1 })
-    Axios({
-      method: "post",
-      url: API + "/goals/update",
-      data: [{ goal: goalObject.goal }, { username: this.state.user }],
-    })
-  }
-  handleSubmit = (message, type, cost) => {
-    this.setState((prevState) => {
-      let requests = [...prevState.requests]
-      requests.push({
-        name: this.state.user,
-        type: type,
-        message: message,
-        id: requests.length + 1,
-      })
-      return {
-        requests,
-      }
-    })
-    this.setState({ currency: this.state.currency - cost })
-    Axios({
-      method: "post",
-      url: API + "/requests/add",
-      data: [
-        { name: this.state.user, type: type, message: message },
-        { user: this.state.user, value: cost },
-      ],
-    })
-  }
-  copyToClipboard = (e) => {
-    this.textArea.select()
-    document.execCommand("copy")
-    e.target.focus()
-  }
-  handleSignup = (username, password) => {
-    let number = Math.random() * (100000000000000000 - 0)
-    Axios({
-      method: "post",
-      url: API + "/users/add",
-      data: {
-        username: username,
-        password: password,
-        status: "pending",
-        string: number,
-      },
-    }).then((res) => {
-      if (res.data === "sign up success") {
+      this.setState({ redemptions: data });
+    });
+    socket.on("signup", (res) => {
+      if (res.text === "sign up success") {
         this.setState({
           signupString: (
             <div>
@@ -129,7 +73,7 @@ class App extends Component {
                 readOnly
                 type="text"
                 ref={(textarea) => (this.textArea = textarea)}
-                value={"!verify " + number}
+                value={"!verify " + res.number}
               />
 
               <button
@@ -141,51 +85,140 @@ class App extends Component {
               <p>paste this in chat</p>
             </div>
           ),
-        })
+        });
       } else {
-        this.setState({ signupString: "name already exists" })
+        this.setState({ signupString: "name already exists" });
       }
-    })
-  }
-  handleLogin = (username, password) => {
-    Axios({
-      method: "post",
-      url: API + "/users",
-      data: { username: username, password: password },
-    }).then((res) => {
-      if (res.data !== null) {
-        if (res.data === "wrong password") {
-          this.setState({ signupString: "wrong password buddy" })
-        } else if (res.data.status === "verified") {
-          this.setState({ user: username, currency: res.data.currency })
+    });
+    socket.on("login", (res) => {
+      if (res !== null) {
+        if (res === "wrong password") {
+          this.setState({ signupString: "wrong password buddy" });
+        } else if (res.status === "verified") {
+          if (res.hasOwnProperty("bgColor"))
+            this.setState({
+              user: res.username,
+              currency: res.currency,
+              bgColor: res.pref.bg,
+            });
+          else {
+            this.setState({
+              user: res.username,
+              currency: res.currency,
+            });
+          }
         } else {
           this.setState({
             signupString:
               "user not verified, sign up and use code to verify your account",
-          })
+          });
         }
       } else {
-        this.setState({ signupString: "user not found, just sign up" })
+        this.setState({ signupString: "user not found, just sign up" });
       }
-    })
-  }
+    });
+    socket.on("forgotpassword", (res) => {
+      this.setState({ signupString: res });
+    });
+    socket.on("starttimer", (timer) => {
+      this.setState({ timer, timerRunning: true });
+
+      this.timerInterval = setInterval(this.timer, 1000);
+    });
+    socket.on("pausetimer", () => {
+      if (this.state.timerRunning) {
+        this.setState({ timerRunning: false });
+        clearInterval(this.timerInterval);
+      } else {
+        this.setState({ timerRunning: true });
+        this.timerInterval = setInterval(this.timer, 1000);
+      }
+    });
+    socket.on("stoptimer", () => {
+      this.setState({ timer: 0 });
+    });
+  };
+  timerInterval;
+  timer = () => {
+    if (this.state.timer > 0) {
+      this.setState((prevState) => {
+        return { timer: prevState.timer - 1 };
+      });
+    } else {
+      clearInterval(this.timerInterval);
+    }
+  };
+  getRequests = () => {
+    socket.emit("getrequests");
+  };
+
+  getGoals = () => {
+    socket.emit("get", "goals");
+  };
+  getRedemptions = () => {
+    socket.emit("get", "redemptions");
+  };
+  handleGoalsUpdate = (goalObject, value) => {
+    let goals = [...this.state.goals];
+    let updateGoal = goals.find(({ goal }) => goal === goalObject.goal);
+    updateGoal.current = updateGoal.current + value;
+    this.setState({ goals, currency: this.state.currency - value });
+    let data = {
+      goal: goalObject.goal,
+      username: this.state.user,
+      value: value,
+      state: goals,
+    };
+    socket.emit("goalupdate", data);
+  };
+  handleSubmit = (message, type, cost) => {
+    this.setState({ currency: this.state.currency - cost });
+    let data = {
+      username: this.state.user,
+      type: type,
+      message: message,
+      value: cost,
+    };
+    socket.emit("requestsupdate", data);
+  };
+  copyToClipboard = (e) => {
+    this.textArea.select();
+    document.execCommand("copy");
+    e.target.focus();
+  };
+  handleSignup = (username, password) => {
+    let number = Math.random() * (100000000000000000 - 0);
+    let data = {
+      username: username,
+      password: password,
+      status: "pending",
+      string: number,
+    };
+    socket.emit("signup", data);
+  };
+  handleLogin = (username, password) => {
+    let data = { username: username, password: password };
+    socket.emit("login", data);
+  };
   handleForgotPassword = (username, password) => {
-    Axios({
-      method: "post",
-      url: API + "/users/forgotpassword",
-      data: { username: username, password: password },
-    }).then((res) => {
-      this.setState({ signupString: res.data })
-    })
-  }
+    let data = { username: username, password: password };
+    socket.emit("forgotpassword", data);
+  };
 
   handleChangeSides = () => {
     if (this.state.mainPosition === "left") {
-      this.setState({ mainPosition: "right" })
+      this.setState({ mainPosition: "right" });
     } else {
-      this.setState({ mainPosition: "left" })
+      this.setState({ mainPosition: "left" });
     }
-  }
+  };
+  handleSaveDefaults = () => {
+    socket.emit("updatepref", {
+      username: this.state.user,
+      position: this.state.mainPosition,
+      bgColor: this.state.bgColor,
+    });
+  };
   state = {
     requests: [],
     goals: [],
@@ -194,7 +227,11 @@ class App extends Component {
     currency: "",
     signupString: "",
     mainPosition: "left",
-  }
+    bgColor: "rgb(47,79,79)",
+    newbgColor: "",
+    timer: 0,
+    timerRunning: false,
+  };
   render() {
     const renderLogin = () => {
       if (this.state.user === "") {
@@ -207,15 +244,15 @@ class App extends Component {
             />
             {this.state.signupString}
           </div>
-        )
+        );
       }
-    }
+    };
     return (
       <div
         style={{
-          height: "100vw",
+          height: "100vh",
           width: "100vw",
-          backgroundColor: "rgb(47,79,79)",
+          backgroundColor: this.state.bgColor,
         }}
       >
         {renderLogin()}
@@ -224,13 +261,9 @@ class App extends Component {
           style={{ float: this.state.mainPosition }}
         >
           <div className="container" id="requestList">
-            <RequestContainer requests={this.state.requests} />
-          </div>
-          <div className="container" id="goals">
-            <GoalsContainer
-              goals={this.state.goals}
-              onCbucksAdd={this.handleGoalsUpdate}
-              currency={this.state.currency}
+            <RequestContainer
+              requests={this.state.requests}
+              timer={this.state.timer}
             />
           </div>
           <div className="container" id="store">
@@ -241,16 +274,23 @@ class App extends Component {
               user={this.state.user}
             />
           </div>
-          <button
-            onClick={this.handleChangeSides}
-            style={{ height: 30, width: 30, float: this.state.mainPosition }}
-          >
-            ↔
-          </button>
+          <div className="container" id="goals">
+            <GoalsContainer
+              goals={this.state.goals}
+              onCbucksAdd={this.handleGoalsUpdate}
+              currency={this.state.currency}
+            />
+          </div>
+
+          <Settings
+            onNewbgColor={this.handleNewbgColor}
+            onChangeSides={this.handleChangeSides}
+            onSaveDefaults={this.handleSaveDefaults}
+          />
         </div>
       </div>
-    )
+    );
   }
 }
 
-export default App
+export default App;

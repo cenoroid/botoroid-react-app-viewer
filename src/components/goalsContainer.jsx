@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-
+import GoalsHeader from "./goalsHeader"
 import Goal from "./goal"
 import ToggleButton from "./toggleButton"
 
@@ -26,7 +26,7 @@ class GoalsContainer extends Component {
               <Goal
                 key={goal.id}
                 goal={goal}
-                onCbucksAdd={() => this.props.onCbucksAdd(goal)}
+                onCbucksAdd={(value) => this.props.onCbucksAdd(goal, value)}
                 currency={this.props.currency}
               />
             ))}
@@ -38,6 +38,7 @@ class GoalsContainer extends Component {
     return (
       <div>
         <ToggleButton status={this.state.show} onToggle={this.handleToggle} />
+        <GoalsHeader />
         {renderPage()}
       </div>
     )

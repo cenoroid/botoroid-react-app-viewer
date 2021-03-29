@@ -18,7 +18,8 @@ class RequestContainer extends Component {
 
   state = {
     show: 1,
-    timer: { minutes: 0, seconds: 0 },
+    minutes: 0,
+    seconds: 0,
   }
 
   render() {
@@ -27,10 +28,10 @@ class RequestContainer extends Component {
         return (
           <div>
             <RequestListTimer
-              timer={this.state.timer}
+              timer={this.props.timer}
               request={this.state.mainRequest}
             />
-            <RequestListHeader />
+
             {this.props.requests.map((request) => (
               <Requests key={request.id} request={request} />
             ))}
@@ -42,6 +43,7 @@ class RequestContainer extends Component {
     return (
       <div>
         <ToggleButton status={this.state.show} onToggle={this.handleToggle} />
+        <RequestListHeader />
         {renderPage()}
       </div>
     )

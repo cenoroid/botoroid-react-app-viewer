@@ -1,36 +1,36 @@
-import React, { Component } from "react"
+import React, { Component } from "react";
 
 class Goal extends Component {
   constructor(props) {
-    super(props)
-    this.state = { value: "", addCbucksButtonClicked: false, width: 485 }
+    super(props);
+    this.state = { value: "", addCbucksButtonClicked: false, width: 485 };
 
-    this.handleChange = this.handleChange.bind(this)
-    this.handleType = this.handleType.bind(this)
+    this.handleChange = this.handleChange.bind(this);
+    this.handleType = this.handleType.bind(this);
   }
   handleChange(event) {
     if (isNaN(event.target.value)) {
-      return
+      return;
     }
-    this.setState({ value: Number(event.target.value) })
+    this.setState({ value: Number(event.target.value) });
   }
   handleType(event) {
-    event.preventDefault()
+    event.preventDefault();
   }
   handleCbucksAdd = () => {
     if (this.props.goal.current + this.state.value <= this.props.goal.end) {
       if (this.props.currency >= this.state.value) {
-        this.props.onCbucksAdd(this.state.value)
+        this.props.onCbucksAdd(this.state.value);
       }
     }
-    this.setState({ addCbucksButtonClicked: false, width: 485 })
-  }
+    this.setState({ addCbucksButtonClicked: false, width: 485 });
+  };
   handleCbucksAddClick = () => {
-    this.setState({ addCbucksButtonClicked: true, width: 300 })
-  }
+    this.setState({ addCbucksButtonClicked: true, width: 300 });
+  };
 
   render() {
-    console.log()
+    console.log();
     const renderAddCbucksButton = () => {
       if (this.props.currency !== "") {
         if (this.state.addCbucksButtonClicked) {
@@ -50,15 +50,15 @@ class Goal extends Component {
                 ➞
               </button>
             </div>
-          )
+          );
         }
         return (
           <button className="goalAdd" onClick={this.handleCbucksAddClick}>
             +
           </button>
-        )
+        );
       }
-    }
+    };
 
     return (
       <div>
@@ -66,7 +66,7 @@ class Goal extends Component {
         {renderAddCbucksButton()}
         <div
           style={{
-            width: (this.props.goal.current / this.props.goal.end) * 490,
+            width: (this.props.goal.current / this.props.goal.end) * 500,
           }}
           className="goalFill"
         ></div>
@@ -74,8 +74,8 @@ class Goal extends Component {
           {this.props.goal.current} /{this.props.goal.end}
         </div>
       </div>
-    )
+    );
   }
 }
 
-export default Goal
+export default Goal;

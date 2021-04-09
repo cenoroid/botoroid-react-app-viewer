@@ -3,7 +3,7 @@ import React, { Component } from "react";
 class Goal extends Component {
   constructor(props) {
     super(props);
-    this.state = { value: "", addCbucksButtonClicked: false, width: 485 };
+    this.state = { value: "", addCbucksButtonClicked: false, width: 335 };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleType = this.handleType.bind(this);
@@ -23,10 +23,10 @@ class Goal extends Component {
         this.props.onCbucksAdd(this.state.value);
       }
     }
-    this.setState({ addCbucksButtonClicked: false, width: 485 });
+    this.setState({ addCbucksButtonClicked: false, width: 335 });
   };
   handleCbucksAddClick = () => {
-    this.setState({ addCbucksButtonClicked: true, width: 300 });
+    this.setState({ addCbucksButtonClicked: true, width: 250 });
   };
 
   render() {
@@ -35,16 +35,16 @@ class Goal extends Component {
       if (this.props.currency !== "") {
         if (this.state.addCbucksButtonClicked) {
           return (
-            <div style={{ position: "absolute", marginTop: -32, right: 20 }}>
+            <div style={{ position: "absolute", marginTop: -33, right: 0 }}>
               <input
-                style={{ width: 60, height: 29.5, marginTop: 2 }}
+                style={{ width: 60, height: 30.5, marginTop: 2 }}
                 value={this.state.value}
                 onChange={this.handleChange}
                 className="goalAddInput"
                 placeholder="cbucks"
               ></input>
               <button
-                style={{ height: 29, width: 29 }}
+                style={{ height: 30, width: 30 }}
                 onClick={this.handleCbucksAdd}
               >
                 ➞
@@ -66,7 +66,7 @@ class Goal extends Component {
         {renderAddCbucksButton()}
         <div
           style={{
-            width: (this.props.goal.current / this.props.goal.end) * 500,
+            width: (this.props.goal.current / this.props.goal.end) * 340,
           }}
           className="goalFill"
         ></div>

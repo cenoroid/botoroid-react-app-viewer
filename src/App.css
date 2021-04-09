@@ -11,7 +11,7 @@
   display: none;
 }
 .mainContainer {
-  width: 525px;
+  width: 350px;
 
   position: relative;
   margin-right: 10px;
@@ -37,7 +37,7 @@
   font-size: 24px;
 
   color: blanchedalmond;
-  text-align: center;
+  text-align: end;
 }
 
 .footer {
@@ -54,7 +54,7 @@
   height: 30px;
   margin-top: 2px;
   border-radius: 3px;
-  width: 490px;
+  width: 340px;
   text-align: start;
   color: blanchedalmond;
   font-family: "Quicksand", sans-serif;
@@ -66,7 +66,7 @@
   height: 30px;
   margin-top: -30px;
   border-radius: 3px;
-  max-width: 490px;
+  max-width: 340px;
 }
 .goalText {
   text-align: end;
@@ -78,7 +78,7 @@
 .goalAdd {
   height: 30px;
   float: right;
-  margin-right: 20px;
+  margin-right: 0px;
   margin-top: -30px;
 }
 .request {
@@ -94,6 +94,7 @@
   margin-left: auto;
   margin-right: auto;
   width: 90%;
+  overflow: hidden;
 }
 #id1.request {
   font-size: 24px;

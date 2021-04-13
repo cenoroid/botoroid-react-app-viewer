@@ -9,7 +9,7 @@ import axios from "axios";
 import Settings from "./settings";
 
 //const API = "http://localhost:4000";
-const API = "https://botoroid-express-app.herokuapp.com/";
+const API = "https://botoroid-express-app.herokuapp.com";
 const socket = io(API);
 const Extention = () => {
   const [user, setUser] = useState("cenoroid");

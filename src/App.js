@@ -1,16 +1,54 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import Extention from "./components/extention";
 import "./App.css";
+import axios from "axios";
+import io from "socket.io-client";
+const API = "http://localhost:4000";
+//const API = "https://botoroid-express-app.herokuapp.com";
+const socket = io(API);
+const App = () => {
+  const [page, setPage] = useState(<div></div>);
+  useEffect(() => {
+    window.Twitch.ext.onAuthorized(async function (auth) {
+      if (window.Twitch.ext.viewer.isLinked) {
+        await axios
+          .post(API + "/getuser", { userToken: auth.token })
+          .then((res) => {
+            console.log(res.data);
+            socket.emit("join", res.data.username);
 
-class App extends Component {
-  state = {};
-  render() {
-    return (
-      <div>
-        <Extention />
-      </div>
-    );
-  }
-}
-
+            setPage(
+              <div>
+                <Extention
+                  user={res.data.username}
+                  currency={res.data.currency}
+                  socket={socket}
+                  API={API}
+                />
+              </div>
+            );
+          });
+      } else {
+        setPage(
+          <div style={{ textAlign: "center" }}>
+            <div style={{ fontSize: 30 }}>
+              In order to use this extention,{<br></br>} you first need to grant
+              it access so it knows who you are
+            </div>
+            <button
+              style={{
+                height: 55,
+                width: 100,
+              }}
+              onClick={() => window.Twitch.ext.actions.requestIdShare()}
+            >
+              OPEN DIALOGUE
+            </button>
+          </div>
+        );
+      }
+    });
+  }, []);
+  return page;
+};
 export default App;

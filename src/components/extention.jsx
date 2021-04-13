@@ -1,38 +1,20 @@
 import React, { useEffect, useState } from "react";
-import io from "socket.io-client";
+
 import RequestContainer from "./requestContainer";
 import GoalsContainer from "./goalsContainer";
 import StoreContainer from "./storeContainer";
 
 //import dotenv from "dotenv";
-import axios from "axios";
+
 import Settings from "./settings";
 
-//const API = "http://localhost:4000";
-const API = "https://botoroid-express-app.herokuapp.com";
-const socket = io(API);
-const Extention = () => {
-  const [user, setUser] = useState("cenoroid");
-  const [currency, setCurrency] = useState(300);
+const Extention = (props) => {
+  const [currency, setCurrency] = useState(props.currency);
   const [position, setPosition] = useState("left");
-  const [twitchThing, setTwitchThing] = useState(0);
-  useEffect(() => {
-    window.Twitch.ext.onAuthorized(async function (auth) {
-      await axios
-        .post(API + "/getuser", { userToken: auth.token })
-        .then((res) => {
-          socket.emit("join", res.data.username);
-          setUser(res.data.username);
-          setTwitchThing(res.data.username);
-          setCurrency(res.data.currency);
-        });
-    });
-  }, []);
 
-  socket.on("updatecurrency", (data) => {
+  props.socket.on("updatecurrency", (data) => {
     setCurrency(currency + data);
   });
-
   function handleChangeSides() {
     if (position === "left") {
       setPosition("right");
@@ -40,50 +22,47 @@ const Extention = () => {
       setPosition("left");
     }
   }
-  function handleSaveDefaults() {
-    socket.emit("updatepref", {
-      username: user,
-      position: position,
-    });
-  }
 
   function handleCurrencyUpdate(value) {
     setCurrency(currency - value);
   }
+
   return (
     <div style={{ height: "100vh", backgroundColor: "transparent" }}>
+      <button
+        style={{ height: 30, width: 30 }}
+        onClick={() => window.Twitch.ext.actions.requestIdShare()}
+      >
+        {props.user}
+      </button>
       <div
         className="mainContainer"
         style={{ float: position, marginRight: 350 }}
       >
         <div className="container" id="requestList">
-          <RequestContainer socket={socket} API={API} />
+          <RequestContainer socket={props.socket} API={props.API} />
         </div>
         <div className="container" id="store">
           <StoreContainer
-            socket={socket}
+            socket={props.socket}
             currency={currency}
-            user={user}
+            user={props.user}
             onCurrencyUpdate={(value) => handleCurrencyUpdate(value)}
-            API={API}
+            API={props.API}
           />
         </div>
         <div className="container" id="goals">
           <GoalsContainer
-            user={user}
-            API={API}
-            socket={socket}
+            user={props.user}
+            API={props.API}
+            socket={props.socket}
             currency={currency}
             onCurrencyUpdate={(value) => handleCurrencyUpdate(value)}
           />
         </div>
 
-        <Settings
-          onChangeSides={handleChangeSides}
-          onSaveDefaults={handleSaveDefaults}
-        />
+        <Settings onChangeSides={handleChangeSides} />
       </div>
-      <div>{twitchThing}</div>
     </div>
   );
 };

@@ -1,57 +1,50 @@
-import React, { Component } from "react";
-
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import Requests from "./requests";
-
 import RequestListHeader from "./requestListHeader";
 import RequestListFooter from "./requestListFooter";
 import RequestListTimer from "./requestListTimer";
 import ToggleButton from "./toggleButton";
 
-class RequestContainer extends Component {
-  componentDidMount() {
-    this.getRequests();
+const RequestContainer = (props) => {
+  const [requests, setRequests] = useState([]);
+  const [show, setShow] = useState(true);
+
+  useEffect(() => {
+    const getRequests = async () => {
+      axios.get(props.API + "/getrequests").then((res) => {
+        setRequests(res.data);
+      });
+    };
+    getRequests();
+  }, [props.API, props.socket]);
+  function handleToggle() {
+    setShow(!show);
   }
-  handleToggle = () => {
-    if (this.state.show === 0) {
-      this.setState({ show: 1 });
-    } else {
-      this.setState({ show: 0 });
+  props.socket.on("getrequests", (data) => {
+    setRequests(data);
+  });
+  const renderPage = () => {
+    if (show) {
+      return (
+        <div>
+          <RequestListTimer socket={props.socket} />
+
+          {requests.map((request) => (
+            <Requests key={request.id} request={request} />
+          ))}
+          <RequestListFooter requests={requests} />
+        </div>
+      );
     }
   };
-  getRequests = () => {
-    this.props.socket.emit("getrequests");
-    this.props.socket.on("getrequests", (data) => {
-      this.setState({ requests: data });
-    });
-  };
-
-  state = {
-    requests: [],
-    show: 1,
-  };
-  render() {
-    const renderPage = () => {
-      if (this.state.show === 1) {
-        return (
-          <div>
-            <RequestListTimer socket={this.props.socket} />
-
-            {this.state.requests.map((request) => (
-              <Requests key={request.id} request={request} />
-            ))}
-            <RequestListFooter requests={this.state.requests} />
-          </div>
-        );
-      }
-    };
-    return (
-      <div>
-        <ToggleButton status={this.state.show} onToggle={this.handleToggle} />
-        <RequestListHeader />
-        {renderPage()}
-      </div>
-    );
-  }
-}
+  return (
+    <div>
+      <ToggleButton status={show} onToggle={handleToggle} />
+      <RequestListHeader />
+      {renderPage()}
+    </div>
+  );
+};
 
 export default RequestContainer;

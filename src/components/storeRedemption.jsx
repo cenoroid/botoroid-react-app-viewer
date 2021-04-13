@@ -1,18 +1,16 @@
-import React, { Component } from "react"
+import React from "react";
 
-class StoreRedemption extends Component {
-  render() {
-    return (
-      <div>
-        <button
-          className="redemption"
-          onClick={() => this.props.onRedeem(this.props.redemption)}
-        >
-          {this.props.redemption.type} : {this.props.redemption.cost}
-        </button>
-      </div>
-    )
-  }
-}
+const StoreRedemption = (props) => {
+  return (
+    <div>
+      <button
+        className="redemption"
+        onClick={() => props.onRedeem(props.redemption)}
+      >
+        {props.redemption.type} : {props.redemption.cost}
+      </button>
+    </div>
+  );
+};
 
-export default StoreRedemption
+export default StoreRedemption;

@@ -1,14 +1,10 @@
-import React, { Component } from "react"
+import React from "react";
 
-class StoreCurrency extends Component {
-  render() {
-    if (this.props.user === "") {
-      return <div className="storeFooter">Log in to buy stuff</div>
-    }
-    return (
-      <div className="storeFooter">You have {this.props.currency} cbucks</div>
-    )
+const StoreCurrency = (props) => {
+  if (props.user === "") {
+    return <div className="storeFooter">Log in to buy stuff</div>;
   }
-}
+  return <div className="storeFooter">You have {props.currency} cbucks</div>;
+};
 
-export default StoreCurrency
+export default StoreCurrency;

@@ -1,9 +1,7 @@
-import React, { Component } from "react"
+import React from "react";
 
-class StoreHeader extends Component {
-  render() {
-    return <div className="storeHeader">Store</div>
-  }
-}
+const StoreHeader = () => {
+  return <div className="storeHeader">Store</div>;
+};
 
-export default StoreHeader
+export default StoreHeader;

@@ -1,79 +1,63 @@
-import React, { Component } from "react";
-
+import React, { useState, useEffect } from "react";
 import StoreRedemption from "./storeRedemption";
 import StoreFooter from "./storeFooter";
 import NewRedemption from "./newRedemption";
 import ToggleButton from "./toggleButton";
 import StoreHeader from "./storeHeader";
-
-class StoreContainer extends Component {
-  componentDidMount() {
-    this.getRedemptions();
+import axios from "axios";
+const StoreContainer = (props) => {
+  const [redemptions, setRedemptions] = useState([]);
+  const [show, setShow] = useState(true);
+  const [newRedemption, setNewRedemption] = useState(null);
+  useEffect(() => {
+    const getRedemptions = async () => {
+      axios.get(props.API + "/getredemptions").then((res) => {
+        setRedemptions(res.data);
+      });
+    };
+    getRedemptions();
+  }, [props.API, props.socket]);
+  function handleToggle() {
+    setShow(!show);
   }
-  getRedemptions = () => {
-    this.props.socket.emit("get", "redemptions");
-    this.props.socket.on("getredemptions", (data) => {
-      for (let index = 0; index < data.length; index++) {
-        data[index].id = index + 1;
-      }
-      this.setState({ redemptions: data });
-    });
-  };
-
-  handleToggle = () => {
-    if (this.state.show === 0) {
-      this.setState({ show: 1 });
-    } else {
-      this.setState({ show: 0 });
+  function handleRedeem(redemption) {
+    setNewRedemption(redemption);
+  }
+  const renderPage = () => {
+    if (newRedemption !== null) {
+      return (
+        <NewRedemption
+          onCurrencyUpdate={(value) => props.onCurrencyUpdate(value)}
+          socket={props.socket}
+          currency={props.currency}
+          user={props.user}
+          newRedemption={newRedemption}
+          onRedeem={handleRedeem}
+          API={props.API}
+        />
+      );
+    }
+    if (show) {
+      return (
+        <div className="storeContainer">
+          {redemptions.map((redemption) => (
+            <StoreRedemption
+              key={redemption.id}
+              redemption={redemption}
+              onRedeem={handleRedeem}
+            />
+          ))}
+        </div>
+      );
     }
   };
-
-  handleRedeem = (redemption) => {
-    this.setState({ newRedemption: redemption });
-  };
-
-  state = {
-    redemptions: [],
-    show: 1,
-    newRedemption: null,
-  };
-  render() {
-    const renderPage = () => {
-      if (this.state.newRedemption !== null) {
-        return (
-          <NewRedemption
-            onCurrencyUpdate={(value) => this.props.onCurrencyUpdate(value)}
-            socket={this.props.socket}
-            currency={this.props.currency}
-            user={this.props.user}
-            newRedemption={this.state.newRedemption}
-            onRedeem={this.handleRedeem}
-          />
-        );
-      }
-      if (this.state.show === 1) {
-        return (
-          <div className="storeContainer">
-            {this.state.redemptions.map((redemption) => (
-              <StoreRedemption
-                key={redemption.id}
-                redemption={redemption}
-                onRedeem={this.handleRedeem}
-              />
-            ))}
-          </div>
-        );
-      }
-    };
-    return (
-      <div>
-        <ToggleButton status={this.state.show} onToggle={this.handleToggle} />
-        <StoreHeader />
-        {renderPage()}
-        <StoreFooter user={this.props.user} currency={this.props.currency} />
-      </div>
-    );
-  }
-}
-
+  return (
+    <div>
+      <ToggleButton status={show} onToggle={handleToggle} />
+      <StoreHeader />
+      {renderPage()}
+      <StoreFooter user={props.user} currency={props.currency} />
+    </div>
+  );
+};
 export default StoreContainer;

@@ -18,8 +18,8 @@ class Requests extends Component {
       <React.Fragment>
         <div className="request" id={"id" + this.props.request.id}>
           {this.props.request.id}.{" "}
-          <img className="icon" src={this.defineIcon()} alt="its an icon"></img>{" "}
-          {this.props.request.message} - {this.props.request.name}
+          <img className="icon" id={"id" + this.props.request.id} src={this.defineIcon()} alt="its an icon"></img>{" "}
+          <div className='requestMessage'>{this.props.request.message}</div> - <div className='requestName'>{this.props.request.name}</div>
         </div>
       </React.Fragment>
     )

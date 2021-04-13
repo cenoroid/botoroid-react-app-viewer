@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import RequestContainer from "./requestContainer";
 import GoalsContainer from "./goalsContainer";

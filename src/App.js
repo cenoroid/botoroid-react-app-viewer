@@ -3,8 +3,8 @@ import Extention from "./components/extention";
 import "./App.css";
 import axios from "axios";
 import io from "socket.io-client";
-const API = "http://localhost:4000";
-//const API = "https://botoroid-express-app.herokuapp.com";
+//const API = "http://localhost:4000";
+const API = "https://botoroid-express-app.herokuapp.com";
 const socket = io(API);
 const App = () => {
   const [page, setPage] = useState(<div></div>);
@@ -16,7 +16,6 @@ const App = () => {
           .then((res) => {
             console.log(res.data);
             socket.emit("join", res.data.username);
-
             setPage(
               <div>
                 <Extention

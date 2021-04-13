@@ -8,8 +8,8 @@ import StoreContainer from "./storeContainer";
 import axios from "axios";
 import Settings from "./settings";
 
-//const API = "http://localhost:4000";
-const API = "https://botoroid-express-app.herokuapp.com";
+const API = "http://localhost:4000";
+//const API = "https://botoroid-express-app.herokuapp.com";
 const socket = io(API);
 const Extention = () => {
   const [user, setUser] = useState("cenoroid");
@@ -19,7 +19,7 @@ const Extention = () => {
   useEffect(() => {
     window.Twitch.ext.onAuthorized(async function (auth) {
       await axios
-        .post(API + "/getuser", { userId: auth.userId })
+        .post(API + "/getuser", { userToken: auth.token })
         .then((res) => {
           socket.emit("join", res.data.username);
           setUser(res.data.username);

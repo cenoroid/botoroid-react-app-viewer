@@ -4,7 +4,7 @@ const Goal = (props) => {
   const [value, handleChange] = useNumberInput({ cbucks: 0 });
   const [{ button, width }, setButton] = useState({
     button: false,
-    width: 330,
+    width: 18 + "vw",
   });
   function handleCbucksAdd() {
     if (value.value !== "" && value.cbucks > 0) {
@@ -14,21 +14,20 @@ const Goal = (props) => {
         }
       }
     }
-    setButton({ button: false, width: 330 });
+    setButton({ button: false, width: 18 + "vw" });
   }
   const renderAddCbucksButton = () => {
     if (button) {
       return (
-        <div style={{ position: "absolute", marginTop: -33, right: 0 }}>
+        <div className="goalAdd">
           <input
             name="cbucks"
-            style={{ width: 60, height: 30.5, marginTop: 2 }}
             value={value.cbucks}
             onChange={handleChange}
             className="goalAddInput"
             placeholder="cbucks"
           ></input>
-          <button style={{ height: 30, width: 30 }} onClick={handleCbucksAdd}>
+          <button className="goalAddButton" onClick={handleCbucksAdd}>
             ➞
           </button>
         </div>
@@ -36,9 +35,9 @@ const Goal = (props) => {
     }
     return (
       <button
-        className="goalAdd"
+        className="goalAddButton"
         onClick={() => {
-          setButton({ button: true, width: 200 });
+          setButton({ button: true, width: 15 + "vw" });
         }}
       >
         +
@@ -46,18 +45,22 @@ const Goal = (props) => {
     );
   };
   return (
-    <div>
-      <div className="goalBorder">{props.goal.goal}</div>
-      {renderAddCbucksButton()}
+    <div className="goal">
+      <div className="goalBorder"></div>
+
       <div
         style={{
-          width: (props.goal.current / props.goal.end) * 340,
+          width: (props.goal.current / props.goal.end) * 97.5 + "%",
         }}
         className="goalFill"
       ></div>
-      <div className="goalText" style={{ width: width }}>
+
+      <div className="goalTitle">{props.goal.goal}</div>
+
+      <div className="goalNumbers" style={{ width: width }}>
         {props.goal.current} /{props.goal.end}
       </div>
+      {renderAddCbucksButton()}
     </div>
   );
 };

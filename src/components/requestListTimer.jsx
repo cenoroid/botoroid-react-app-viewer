@@ -1,47 +1,58 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 
-class RequestListTimer extends Component {
-  componentDidMount() {
-    this.getTimer();
-  }
-  getTimer = () => {
-    this.props.socket.emit("gettimer");
-    this.props.socket.on("starttimer", (timer, timerRunning) => {
-      if (timer > 0) {
-        this.setState({ timer, timerRunning });
-        if (timerRunning) {
-          this.timerInterval = setInterval(this.timer, 1000);
-        }
+const RequestListTimer = (props) => {
+  const [timer, setTimer] = useState(0);
+  const [timerRunning, setTimerRunning] = useState(false);
+
+  useEffect(() => {
+    props.socket.emit("gettimer");
+    props.socket.on("starttimer", (resTimer, resTimerRunning) => {
+      console.log("yes");
+      if (resTimer > 0) {
+        setTimer(resTimer);
+        setTimerRunning(resTimerRunning);
       }
     });
-    this.props.socket.on("pausetimer", () => {
-      if (this.state.timerRunning) {
-        this.setState({ timerRunning: false });
-        clearInterval(this.timerInterval);
-      } else {
-        this.setState({ timerRunning: true });
-        this.timerInterval = setInterval(this.timer, 1000);
-      }
+    props.socket.on("pausetimer", () => {
+      console.log("ok");
+      setTimerRunning((prevState) => !prevState);
     });
-    this.props.socket.on("stoptimer", () => {
-      this.setState({ timer: 0 });
+    props.socket.on("stoptimer", () => {
+      setTimerRunning(false);
+      setTimer(0);
     });
-  };
-  timerInterval;
-  timer = () => {
-    if (this.state.timer > 0) {
-      this.setState((prevState) => {
-        return { timer: prevState.timer - 1 };
-      });
+  }, [props.socket]);
+
+  useEffect(() => {
+    console.log(timerRunning);
+    let timerInterval;
+    let newTimer;
+    if (timerRunning) {
+      newTimer = timer;
+      timerInterval = setInterval(() => {
+        countdown();
+      }, 1000);
     } else {
-      this.setState({ timerRunning: false });
-      clearInterval(this.timerInterval);
-      console.log("runs");
+      clearInterval(timerInterval);
     }
-  };
-  timerConvert = () => {
-    let minutes = Math.floor(this.state.timer / 60);
-    let seconds = Math.floor(this.state.timer % 60);
+    function countdown() {
+      console.log(newTimer);
+      if (newTimer > 0) {
+        newTimer = newTimer - 1;
+        setTimer((prevTimer) => prevTimer - 1);
+      } else {
+        setTimerRunning(false);
+      }
+      console.log(newTimer);
+    }
+    return () => {
+      clearInterval(timerInterval);
+    };
+  }, [timerRunning]);
+
+  function timerConvert() {
+    let minutes = Math.floor(timer / 60);
+    let seconds = Math.floor(timer % 60);
     if (minutes < 10) {
       minutes = "0" + minutes;
     }
@@ -49,11 +60,9 @@ class RequestListTimer extends Component {
       seconds = "0" + seconds;
     }
     return minutes + "m" + seconds + "s";
-  };
-  state = { timer: 0, timerRunning: false };
-  render() {
-    return <div className="requestListTimer">{this.timerConvert()}</div>;
   }
-}
+
+  return <div className="requestListTimer">{timerConvert()}</div>;
+};
 
 export default RequestListTimer;

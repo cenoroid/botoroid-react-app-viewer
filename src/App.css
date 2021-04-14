@@ -11,32 +11,35 @@
   display: none;
 }
 .mainContainer {
-  width: 350px;
+  margin-top: 8vh;
+  width: 20vw;
   position: relative;
-  margin-right: 10px;
+  margin-right: 0.5vw;
+  margin-left: 0.5vw;
 }
 .container {
-  clear: right;
-  margin-top: 15px;
+  margin-top: 1vh;
 }
-
 .toggleButton {
-  float: right;
-  height: 25px;
+  right: 0;
+  height: 2vh;
   background-color: transparent;
   border-radius: 4px;
-  width: 25px;
+  width: 2vw;
   border: none;
+  outline: none;
+  position: absolute;
+  font-size: 1vw;
 }
 .header {
+  width: 90%;
   border-radius: 14px;
   background-color: rgb(0, 0, 0, 0.3);
-
   font-family: "Quicksand", sans-serif;
-  font-size: 24px;
-
+  font-size: 1.3vw;
   color: blanchedalmond;
   text-align: end;
+  padding-right: 2vw;
 }
 
 .footer {
@@ -44,52 +47,80 @@
   border-radius: 14px;
   background-color: rgb(0, 0, 0, 0.3);
   font-family: "Quicksand", sans-serif;
-  font-size: 15;
+  font-size: 0.9vw;
   color: blanchedalmond;
   text-align: center;
 }
+.goal {
+  margin-top: 0.2vh;
+}
 .goalBorder {
   background-color: black;
-  height: 30px;
-  margin-top: 2px;
+  height: 2.7vh;
   border-radius: 3px;
-  width: 340px;
-  text-align: start;
-  color: blanchedalmond;
-  font-family: "Quicksand", sans-serif;
-  font-size: 20px;
-  padding-left: 10px;
+  width: 97.63%;
 }
 .goalFill {
   background-color: rgb(0, 153, 0);
-  height: 30px;
-  margin-top: -30px;
+  height: 2.7vh;
   border-radius: 3px;
-  max-width: 340px;
+  max-width: 97.8%;
+  margin-top: -2.7vh;
+  position: absolute;
 }
-.goalText {
+.goalTitle {
+  text-align: start;
+  color: blanchedalmond;
+  font-family: "Quicksand", sans-serif;
+  font-size: 1vw;
+  padding-left: 0.5vw;
+  margin-top: -2.5vh;
+  position: absolute;
+}
+.goalNumbers {
   text-align: end;
   color: blanchedalmond;
   font-family: "Quicksand", sans-serif;
-  font-size: 20px;
-  margin-top: -30px;
+  font-size: 1vw;
+  margin-top: -2.5vh;
+  position: absolute;
 }
-.goalAdd {
-  height: 30px;
-  float: right;
-  margin-right: 0px;
-  margin-top: -30px;
+.goalAddButton {
+  font-size: 1vw;
+  box-sizing: border-box;
+  height: 2.7vh;
+  right: 0;
+  outline: none;
+  width: 1vw;
+  margin-top: -2.7vh;
+  position: absolute;
+}
+.goalAddInput {
+  box-sizing: border-box;
+  width: 2vw;
+  height: 2.7vh;
+  right: 1vw;
+  margin-top: -2.7vh;
+  position: absolute;
+}
+.goalsHeader {
+  text-align: center;
+  font-size: 1.3vw;
+
+  border-radius: 14px;
+  background: gray;
 }
 .request {
+  box-sizing: border-box;
   color: blanchedalmond;
   text-align: left;
   font-family: "Titillium Web";
-  padding-left: 10px;
-  font-size: 18px;
-  background-color: rgb(0, 0, 0, 0.3);
+  padding-left: 0.5vw;
+  font-size: 1.8vh;
+  background-color: rgb(0, 0, 0, 0.7);
   border-radius: 14px;
-  height: 28px;
-  margin-top: 1px;
+  height: 2.8vh;
+  margin-top: 0.1vh;
   margin-left: auto;
   margin-right: auto;
   width: 90%;
@@ -97,63 +128,60 @@
   max-width: 90%;
   overflow: hidden;
   display: flex;
-  padding-right: 10px;
+  padding-right: 0.5vw;
 }
 #id1.request {
-  font-size: 24px;
-  height: 38px;
+  font-size: 1.3vw;
+  height: 3.5vh;
   width: 100%;
+  max-width: 100%;
 }
 .icon {
-  height: 18px;
-  margin-top: 4px;
+  height: 1.5vh;
+  margin-top: 0.7vh;
 }
 #id1.icon {
-  height: 20px;
-  margin-top: 8px;
+  height: 1.9vh;
 }
 .requestMessage {
   display: inline-block;
   overflow: hidden;
   white-space: nowrap;
   vertical-align: top;
-
   min-width: 0%;
 }
 .requestName {
   display: inline-block;
-
-  flex: 10;
+  flex: 1;
 }
 .requestListTimer {
   color: white;
-  font-size: 24px;
+  font-size: 1.4vw;
   font-family: "Titillium Web";
   position: absolute;
-  margin-left: 14px;
-  margin-top: -38px;
+  margin-left: 0.8vw;
+  margin-top: -3.4vh;
 }
 .redemption {
   border: transparent;
-  font-size: 24px;
+  font-size: 1.2vw;
   font-family: "Quicksand", sans-serif;
   background-color: purple;
-  padding-left: 10px;
 }
 .redemption:hover {
-  font-size: 30px;
+  font-size: 1.3vw;
 }
 .storeFooter {
   font-family: "Quicksand", sans-serif;
   text-align: center;
   border: 1px solid black;
   border-radius: 14px;
-  font-size: 20px;
+  font-size: 1vw;
 }
 .storeHeader {
   font-family: "Quicksand", sans-serif;
   text-align: center;
-  font-size: 30px;
+  font-size: 1.5vw;
   background-color: orange;
   border-radius: 14px;
 }
@@ -175,45 +203,37 @@
 .backButton {
   right: 0px;
   position: absolute;
-  height: 40px;
-  width: 50px;
+  height: 2vh;
+  width: 2vw;
   border-radius: 14px;
-  font-size: 50px;
   text-align: center;
 }
 .backButtonText {
-  margin-top: -25px;
+  font-size: 2vw;
+  margin-top: -1.2vh;
 }
 .redemptionLabel {
   font-family: "Quicksand", sans-serif;
   text-align: center;
-  font-size: 30px;
+  font-size: 1.3vw;
 }
 .redemptionInput {
-  width: 50%;
+  width: 70%;
+  height: 2vh;
 }
 .redemptionButton {
-  font-size: 20px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  font-size: 1vw;
+  margin-top: 1vh;
+  margin-bottom: 1vh;
   border-radius: 14px;
-
-  height: 35px;
-  width: 50%;
+  height: 3vh;
+  width: 40%;
 }
 .redemptionInfo {
   width: 100%;
+  font-size: 1vw;
 }
-.loginContainer {
-  position: absolute;
-  left: 45%;
-  margin-top: 10px;
-  background-color: slategray;
-  padding: 10px;
-  padding-left: 40px;
-  padding-bottom: 0px;
-  border-radius: 120px;
-}
+
 .loginContainer:empty {
   display: none;
 }

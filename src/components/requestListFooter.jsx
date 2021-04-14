@@ -1,20 +1,19 @@
-import React, { Component } from "react"
+import React from "react";
 
-class Footer extends Component {
-  defineText = () => {
-    let text = "No requests ResidentSleeper"
-    if (this.props.requests.length !== 0) {
-      text = "--Some more requests--"
+const Footer = (props) => {
+  function defineText() {
+    let text = "No requests ResidentSleeper";
+    if (props.requests.length !== 0) {
+      text = "--Some more requests--";
     }
-    return text
+    return text;
   }
-  render() {
-    return (
-      <React.Fragment>
-        <div className="footer">{this.defineText()}</div>
-      </React.Fragment>
-    )
-  }
-}
 
-export default Footer
+  return (
+    <React.Fragment>
+      <div className="footer">{defineText()}</div>
+    </React.Fragment>
+  );
+};
+
+export default Footer;

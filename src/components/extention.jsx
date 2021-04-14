@@ -26,19 +26,9 @@ const Extention = (props) => {
   function handleCurrencyUpdate(value) {
     setCurrency(currency - value);
   }
-
   return (
-    <div style={{ height: "100vh", backgroundColor: "transparent" }}>
-      <button
-        style={{ height: 30, width: 30 }}
-        onClick={() => window.Twitch.ext.actions.requestIdShare()}
-      >
-        {props.user}
-      </button>
-      <div
-        className="mainContainer"
-        style={{ float: position, marginRight: 350 }}
-      >
+    <div>
+      <div className="mainContainer" style={{ float: position }}>
         <div className="container" id="requestList">
           <RequestContainer socket={props.socket} API={props.API} />
         </div>

@@ -1,19 +1,18 @@
-import React, { Component } from "react"
+import React from "react";
 
-class ToggleButton extends Component {
-  buttonText = () => {
-    if (this.props.status === 0) {
-      return "🗖"
+const ToggleButton = (props) => {
+  function buttonText() {
+    if (!props.status) {
+      return "🗖";
     }
-    return "🗕"
+    return "🗕";
   }
-  render() {
-    return (
-      <button className="toggleButton" onClick={this.props.onToggle}>
-        {this.buttonText()}
-      </button>
-    )
-  }
-}
 
-export default ToggleButton
+  return (
+    <button className="toggleButton" onClick={() => props.onToggle()}>
+      {buttonText()}
+    </button>
+  );
+};
+
+export default ToggleButton;

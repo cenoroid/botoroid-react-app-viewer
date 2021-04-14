@@ -48,6 +48,7 @@ const RequestListTimer = (props) => {
     return () => {
       clearInterval(timerInterval);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timerRunning]);
 
   function timerConvert() {

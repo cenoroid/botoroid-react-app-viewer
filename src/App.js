@@ -8,6 +8,7 @@ const API = "https://botoroid-express-app.herokuapp.com";
 const socket = io(API);
 const App = () => {
   const [page, setPage] = useState(<div></div>);
+
   useEffect(() => {
     window.Twitch.ext.onAuthorized(async function (auth) {
       if (window.Twitch.ext.viewer.isLinked) {
@@ -47,6 +48,7 @@ const App = () => {
         );
       }
     });
+    //leave room situation
   }, []);
   return page;
 };

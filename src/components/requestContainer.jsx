@@ -28,6 +28,8 @@ const RequestContainer = (props) => {
     if (show) {
       return (
         <div>
+          <ToggleButton status={show} onToggle={handleToggle} />
+          <RequestListHeader />
           <RequestListTimer socket={props.socket} />
 
           {requests.map((request) => (
@@ -36,15 +38,17 @@ const RequestContainer = (props) => {
           <RequestListFooter requests={requests} />
         </div>
       );
+    } else if (props.hovering) {
+      return (
+        <div>
+          <ToggleButton status={show} onToggle={handleToggle} />
+          <RequestListHeader />
+        </div>
+      );
     }
+    return null;
   };
-  return (
-    <div>
-      <ToggleButton status={show} onToggle={handleToggle} />
-      <RequestListHeader />
-      {renderPage()}
-    </div>
-  );
+  return <div>{renderPage()}</div>;
 };
 
 export default RequestContainer;

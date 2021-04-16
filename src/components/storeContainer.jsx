@@ -9,6 +9,7 @@ const StoreContainer = (props) => {
   const [redemptions, setRedemptions] = useState([]);
   const [show, setShow] = useState(true);
   const [newRedemption, setNewRedemption] = useState(null);
+
   useEffect(() => {
     const getRedemptions = async () => {
       axios.get(props.API + "/getredemptions").then((res) => {
@@ -38,26 +39,35 @@ const StoreContainer = (props) => {
       );
     }
     if (show) {
+      //max
       return (
-        <div className="storeContainer">
-          {redemptions.map((redemption) => (
-            <StoreRedemption
-              key={redemption.id}
-              redemption={redemption}
-              onRedeem={handleRedeem}
-            />
-          ))}
+        <div>
+          <ToggleButton status={show} onToggle={handleToggle} />
+          <StoreHeader />
+          <div className="storeContainer">
+            {redemptions.map((redemption) => (
+              <StoreRedemption
+                key={redemption.id}
+                redemption={redemption}
+                onRedeem={handleRedeem}
+              />
+            ))}
+          </div>
+          <StoreFooter user={props.user} currency={props.currency} />
+        </div>
+      );
+    } else if (props.hovering) {
+      return (
+        <div>
+          <ToggleButton status={show} onToggle={handleToggle} />
+          <StoreHeader />
+          <StoreFooter user={props.user} currency={props.currency} />
         </div>
       );
     }
+    return null;
   };
-  return (
-    <div>
-      <ToggleButton status={show} onToggle={handleToggle} />
-      <StoreHeader />
-      {renderPage()}
-      <StoreFooter user={props.user} currency={props.currency} />
-    </div>
-  );
+
+  return <div>{renderPage()}</div>;
 };
 export default StoreContainer;

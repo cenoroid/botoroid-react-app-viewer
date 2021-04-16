@@ -38,6 +38,8 @@ const GoalsContainer = (props) => {
     if (show) {
       return (
         <div>
+          <ToggleButton status={show} onToggle={handleToggle} />
+          <GoalsHeader />
           {goals.map((goal) => (
             <Goal
               key={goal.id}
@@ -48,15 +50,17 @@ const GoalsContainer = (props) => {
           ))}
         </div>
       );
+    } else if (props.hovering) {
+      return (
+        <div>
+          <ToggleButton status={show} onToggle={handleToggle} />
+          <GoalsHeader />
+        </div>
+      );
     }
+    return null;
   };
-  return (
-    <div>
-      <ToggleButton status={show} onToggle={handleToggle} />
-      <GoalsHeader />
-      {renderPage()}
-    </div>
-  );
+  return renderPage();
 };
 
 export default GoalsContainer;

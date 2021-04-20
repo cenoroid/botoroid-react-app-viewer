@@ -4,25 +4,22 @@ import GoalsContainer from "./goalsContainer";
 import StoreContainer from "./storeContainer";
 import Chests from "./chests";
 import Settings from "./settings";
-import axios from "axios";
+
 const Extention = (props) => {
   const [currency, setCurrency] = useState(props.currency);
   const [position, setPosition] = useState("left");
   const [showChests, setShowChests] = useState(true);
-  const [hovering, setHovering] = useState();
+  const [hovering, setHovering] = useState(false);
   window.Twitch.ext.onContext((object) => {
-    console.log("ofc");
     if (object.arePlayerControlsVisible && !hovering) {
       setHovering(true);
     } else if (!object.arePlayerControlsVisible && hovering) {
       setHovering(false);
     }
   });
-
   props.socket.on("updatecurrency", (data) => {
     setCurrency(currency + data);
   });
-
   function handleChangeSides() {
     if (position === "left") {
       setPosition("right");
@@ -34,7 +31,7 @@ const Extention = (props) => {
     setCurrency(currency - value);
   }
   function handleChestPlus() {
-    axios.post(props.API + "/updatecurrency", {
+    props.socket.emit("updatecurrency", {
       username: props.user,
       value: 1,
     });

@@ -46,8 +46,8 @@ const Chests = (props) => {
             alt="its a chest"
             style={{
               objectFit: "cover",
-              height: 2 + "vw",
-              width: 2 + "vw",
+              height: 3 + "vw",
+              width: 3 + "vw",
             }}
             src={treasureChest}
           ></img>

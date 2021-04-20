@@ -11,13 +11,11 @@ const StoreContainer = (props) => {
   const [newRedemption, setNewRedemption] = useState(null);
 
   useEffect(() => {
-    const getRedemptions = async () => {
-      axios.get(props.API + "/getredemptions").then((res) => {
-        setRedemptions(res.data);
-      });
-    };
-    getRedemptions();
-  }, [props.API, props.socket]);
+    axios.get(props.API + "/getredemptions").then((res) => {
+      setRedemptions(res.data);
+    });
+    // eslint-disable-next-line
+  }, []);
   function handleToggle() {
     setShow(!show);
   }

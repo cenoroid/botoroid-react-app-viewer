@@ -8,14 +8,12 @@ const API = "https://botoroid-express-app.herokuapp.com";
 const socket = io(API);
 const App = () => {
   const [page, setPage] = useState(<div></div>);
-
   useEffect(() => {
     window.Twitch.ext.onAuthorized(async function (auth) {
       if (window.Twitch.ext.viewer.isLinked) {
         await axios
           .post(API + "/getuser", { userToken: auth.token })
           .then((res) => {
-            console.log(res.data);
             socket.emit("join", res.data.username);
             setPage(
               <div>
@@ -30,7 +28,7 @@ const App = () => {
           });
       } else {
         setPage(
-          <div style={{ textAlign: "center" }}>
+          <div style={{ width: "50vw", textAlign: "center" }}>
             <div style={{ fontSize: 30 }}>
               In order to use this extention,{<br></br>} you first need to grant
               it access so it knows who you are
@@ -48,7 +46,6 @@ const App = () => {
         );
       }
     });
-    //leave room situation
   }, []);
   return page;
 };

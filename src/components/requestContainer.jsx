@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+
 import Requests from "./requests";
 import RequestListHeader from "./requestListHeader";
 import RequestListFooter from "./requestListFooter";
@@ -11,19 +11,16 @@ const RequestContainer = (props) => {
   const [show, setShow] = useState(true);
 
   useEffect(() => {
-    const getRequests = async () => {
-      axios.get(props.API + "/getrequests").then((res) => {
-        setRequests(res.data);
-      });
-    };
-    getRequests();
-  }, [props.API, props.socket]);
+    props.socket.emit("getrequests");
+    props.socket.on("getrequests", (data) => {
+      setRequests(data);
+    });
+    // eslint-disable-next-line
+  }, []);
   function handleToggle() {
     setShow(!show);
   }
-  props.socket.on("getrequests", (data) => {
-    setRequests(data);
-  });
+
   const renderPage = () => {
     if (show) {
       return (

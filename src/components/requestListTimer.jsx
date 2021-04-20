@@ -18,40 +18,24 @@ const RequestListTimer = (props) => {
       setTimerRunning((prevState) => !prevState);
     });
     props.socket.on("stoptimer", () => {
-      setTimerRunning(false);
       setTimer(0);
     });
-  }, [props.socket]);
-
+    // eslint-disable-next-line
+  }, []);
   useEffect(() => {
-    console.log(timerRunning);
-    let timerInterval;
-    let newTimer;
-    if (timerRunning) {
-      newTimer = timer;
-      timerInterval = setInterval(() => {
-        countdown();
-      }, 1000);
-    } else {
-      clearInterval(timerInterval);
-    }
-    function countdown() {
-      console.log(newTimer);
-      if (newTimer > 0) {
-        newTimer = newTimer - 1;
-        setTimer((prevTimer) => prevTimer - 1);
-      } else {
-        setTimerRunning(false);
+    if (timer > 0) {
+      if (timerRunning) {
+        setTimeout(() => {
+          setTimer((prev) => prev - 1);
+        }, 1000);
       }
-      console.log(newTimer);
-    }
-    return () => {
-      clearInterval(timerInterval);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timerRunning]);
+    } else setTimerRunning(false);
+  }, [timer, timerRunning]);
 
   function timerConvert() {
+    if (timer < 0) {
+      setTimer(0);
+    }
     let minutes = Math.floor(timer / 60);
     let seconds = Math.floor(timer % 60);
     if (minutes < 10) {
@@ -62,7 +46,6 @@ const RequestListTimer = (props) => {
     }
     return minutes + "m" + seconds + "s";
   }
-
   return <div className="requestListTimer">{timerConvert()}</div>;
 };
 

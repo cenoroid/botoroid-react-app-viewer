@@ -1,6 +1,6 @@
 import React from "react";
 import { useLetterInput } from "./useLetterInput";
-import axios from "axios";
+
 const NewRedemption = (props) => {
   const [value, handleChange] = useLetterInput({ redemptionInput: "" });
   function defineText() {
@@ -46,9 +46,10 @@ const NewRedemption = (props) => {
         username: props.user,
         type: props.newRedemption.type,
         message: value.redemptionInput,
-        value: -props.newRedemption.cost,
+        value: props.newRedemption.cost,
       };
-      axios.post(props.API + "/requestupdate", data);
+      console.log(data);
+      props.socket.emit("requestupdate", data);
 
       props.onRedeem(null);
     }
@@ -62,6 +63,7 @@ const NewRedemption = (props) => {
 
       <div className="redemptionLabel">{redemptionText[0]}</div>
       <input
+        autoComplete="off"
         name="redemptionInput"
         className="redemptionInput"
         type="text"

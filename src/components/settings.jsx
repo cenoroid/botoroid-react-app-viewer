@@ -9,7 +9,7 @@ const Settings = (props) => {
   const renderSettings = () => {
     if (show) {
       return (
-        <div>
+        <div style={{ backgroundColor: "grey", borderRadius: 5 }}>
           <div>
             Change Sides
             <button

@@ -2,22 +2,17 @@ import React, { useState, useEffect } from "react";
 import GoalsHeader from "./goalsHeader";
 import Goal from "./goal";
 import ToggleButton from "./toggleButton";
-import axios from "axios";
+
 const GoalsContainer = (props) => {
   const [goals, setGoals] = useState([]);
   const [show, setShow] = useState(true);
   useEffect(() => {
-    const getGoals = async () => {
-      axios.get(props.API + "/getgoals").then((res) => {
-        setGoals(res.data);
-      });
-    };
-    getGoals();
-  }, [props.API, props.socket]);
-
-  props.socket.on("getgoals", (data) => {
-    setGoals(data);
-  });
+    props.socket.emit("getgoals");
+    props.socket.on("getgoals", (data) => {
+      setGoals(data);
+    });
+    // eslint-disable-next-line
+  }, []);
   function handleToggle() {
     setShow(!show);
   }
@@ -28,9 +23,7 @@ const GoalsContainer = (props) => {
       value: value,
     };
 
-    axios
-      .post(props.API + "/goalupdate", data)
-      .catch((err) => console.log(err));
+    props.socket.emit("goalupdate", data);
 
     props.onCurrencyUpdate(value);
   }

@@ -13,6 +13,7 @@ const RequestContainer = (props) => {
   useEffect(() => {
     props.socket.emit("getrequests");
     props.socket.on("getrequests", (data) => {
+      console.log(data);
       setRequests(data);
     });
     // eslint-disable-next-line

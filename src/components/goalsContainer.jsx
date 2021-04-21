@@ -7,6 +7,7 @@ const GoalsContainer = (props) => {
   const [goals, setGoals] = useState([]);
   const [show, setShow] = useState(true);
   useEffect(() => {
+    console.log("this is goals");
     props.socket.emit("getgoals");
     props.socket.on("getgoals", (data) => {
       setGoals(data);

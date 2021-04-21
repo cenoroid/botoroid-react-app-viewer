@@ -44,7 +44,8 @@ const NewRedemption = (props) => {
       props.onCurrencyUpdate(props.newRedemption.cost);
       let data = {
         username: props.user,
-        type: props.newRedemption.type,
+        type: "redemption",
+        subtype: props.newRedemption.type,
         message: value.redemptionInput,
         value: props.newRedemption.cost,
       };

@@ -5,11 +5,11 @@ import gameIconImport from "./xboxicon.png";
 
 const Requests = (props) => {
   function defineIcon() {
-    if (props.request.type === "game request") {
+    if (props.request.subtype === "game request") {
       return gameIconImport;
-    } else if (props.request.type === "video request") {
+    } else if (props.request.subtype === "video request") {
       return youtubeIconImport;
-    } else if (props.request.type === "short video request") {
+    } else if (props.request.subtype === "short video request") {
       return greyYoutubeIconImport;
     }
   }

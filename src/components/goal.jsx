@@ -1,16 +1,21 @@
 import React, { useState } from "react";
 import { useNumberInput } from "./useNumberInput";
 const Goal = (props) => {
-  const [value, handleChange] = useNumberInput({ cbucks: 0 });
+  const {
+    value: amount,
+    bind: bindAmount,
+    reset: resetAmount,
+  } = useNumberInput("");
   const [{ button, width }, setButton] = useState({
     button: false,
     width: 18 + "vw",
   });
   function handleCbucksAdd() {
-    if (value.value !== "" && value.cbucks > 0) {
-      if (props.goal.current + Number(value.cbucks) <= props.goal.end) {
-        if (props.currency >= value.cbucks) {
-          props.onCbucksAdd(value.cbucks);
+    if (amount > 0) {
+      if (props.goal.current + Number(amount) <= props.goal.end) {
+        if (props.currency >= amount) {
+          props.onCbucksAdd(amount);
+          resetAmount();
         }
       }
     }
@@ -21,9 +26,8 @@ const Goal = (props) => {
       return (
         <div className="goalAdd">
           <input
-            name="cbucks"
-            value={value.cbucks}
-            onChange={handleChange}
+            autoComplete="off"
+            {...bindAmount}
             className="goalAddInput"
             placeholder="cbucks"
           ></input>

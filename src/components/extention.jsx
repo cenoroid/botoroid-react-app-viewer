@@ -35,7 +35,6 @@ const Extention = (props) => {
       username: props.user,
       value: 1,
     });
-    setCurrency(currency + 1);
   }
   function handleToggleChests() {
     setShowChests((prevState) => !prevState);

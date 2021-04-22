@@ -2,10 +2,17 @@ import { useState } from "react";
 
 export const useLetterInput = (initialValue) => {
   const [value, setValue] = useState(initialValue);
-  return [
+  return {
     value,
-    (e) => {
-      setValue({ ...value, [e.target.name]: e.target.value });
+    setValue,
+    reset: () => {
+      setValue("");
     },
-  ];
+    bind: {
+      value,
+      onChange: (e) => {
+        setValue(e.target.value);
+      },
+    },
+  };
 };

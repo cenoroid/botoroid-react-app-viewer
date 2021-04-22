@@ -2,7 +2,7 @@ import React from "react";
 import { useLetterInput } from "./useLetterInput";
 
 const NewRedemption = (props) => {
-  const [value, handleChange] = useLetterInput({ redemptionInput: "" });
+  const { value: userInput, bind: bind, reset: reset } = useLetterInput("");
   function defineText() {
     let label, info;
     let redemptionText = [];
@@ -46,13 +46,14 @@ const NewRedemption = (props) => {
         username: props.user,
         type: "redemption",
         subtype: props.newRedemption.type,
-        message: value.redemptionInput,
+        message: userInput,
         value: props.newRedemption.cost,
       };
       console.log(data);
       props.socket.emit("requestupdate", data);
 
       props.onRedeem(null);
+      reset();
     }
   }
 
@@ -68,8 +69,7 @@ const NewRedemption = (props) => {
         name="redemptionInput"
         className="redemptionInput"
         type="text"
-        value={value.redemptionInput}
-        onChange={handleChange}
+        {...bind}
       />
       <div className="redemptionInfo">{redemptionText[1]}</div>
       <button className="redemptionButton" onClick={handleSubmit}>

@@ -2,12 +2,18 @@ import { useState } from "react";
 
 export const useNumberInput = (initialValue) => {
   const [value, setValue] = useState(initialValue);
-  return [
+
+  return {
     value,
-    (e) => {
-      if (!isNaN(e.target.value)) {
-        setValue({ ...value, [e.target.name]: Number(e.target.value) });
-      }
+    setValue,
+    reset: () => {
+      setValue("");
     },
-  ];
+    bind: {
+      value,
+      onChange: (e) => {
+        setValue(Number(e.target.value));
+      },
+    },
+  };
 };

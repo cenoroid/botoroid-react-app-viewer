@@ -2,7 +2,7 @@ import React from "react";
 import { useLetterInput } from "./useLetterInput";
 
 const NewRedemption = (props) => {
-  const { value: userInput, bind: bind, reset: reset } = useLetterInput("");
+  const { value: userInput, bind, reset } = useLetterInput("");
   function defineText() {
     let label, info;
     let redemptionText = [];

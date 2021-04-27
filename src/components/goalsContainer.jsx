@@ -5,7 +5,7 @@ import ToggleButton from "./toggleButton";
 
 const GoalsContainer = (props) => {
   const [goals, setGoals] = useState([]);
-  const [show, setShow] = useState(true);
+  const [show, setShow] = useState(false);
   useEffect(() => {
     console.log("this is goals");
     props.socket.emit("getgoals");

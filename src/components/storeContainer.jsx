@@ -7,7 +7,7 @@ import StoreHeader from "./storeHeader";
 import axios from "axios";
 const StoreContainer = (props) => {
   const [redemptions, setRedemptions] = useState([]);
-  const [show, setShow] = useState(true);
+  const [show, setShow] = useState(false);
   const [newRedemption, setNewRedemption] = useState(null);
 
   useEffect(() => {

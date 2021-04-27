@@ -1,14 +1,47 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { useTransition, animated } from "react-spring";
 import treasureChest from "./treasure.png";
+
 const Chests = (props) => {
   const [show, setShow] = useState(false);
-  const [buttonText, setButtonText] = useState(null);
-  const [chestPosW, setChestPosW] = useState();
-  const [chestPosH, setChestPosH] = useState();
+  const [buttonText, setButtonText] = useState(
+    <img
+      alt="its a chest"
+      style={{
+        objectFit: "cover",
+        height: 3 + "vw",
+        width: 3 + "vw",
+      }}
+      src={treasureChest}
+    ></img>
+  );
+  //const [chestPosW, setChestPosW] = useState();
+  //const [chestPosH, setChestPosH] = useState();
+  const chestPosW = useRef(null);
+  const chestPosH = useRef(null);
+  const transition = useTransition(show, {
+    from: {
+      opacity: 0,
+    },
+    enter: {
+      marginLeft: chestPosW.current + "vw",
+      marginTop: chestPosH.current + "vh",
+      opacity: 1,
+    },
+  });
+
   useEffect(() => {
-    setChestPosW(Math.floor(Math.random() * 76));
-    setChestPosH(Math.floor(Math.random() * 66) + 10);
-    setButtonText(null);
+    setButtonText(
+      <img
+        alt="its a chest"
+        style={{
+          objectFit: "cover",
+          height: 3 + "vw",
+          width: 3 + "vw",
+        }}
+        src={treasureChest}
+      ></img>
+    );
     if (show) {
       setTimeout(() => {
         setShow(false);
@@ -16,8 +49,11 @@ const Chests = (props) => {
     }
     if (!show) {
       setTimeout(() => {
+        chestPosW.current = Math.floor(Math.random() * 76);
+        chestPosH.current = Math.floor(Math.random() * 66) + 10;
         setShow(true);
-      }, Math.floor(Math.random() * 1200000 + 3000000));
+        console.log(chestPosW.current);
+      }, Math.floor(Math.random() * 1200 + 3000));
     }
   }, [show]);
   function handleChest() {
@@ -28,32 +64,23 @@ const Chests = (props) => {
     }, 2000);
   }
   if (props.showChests) {
-    if (show) {
-      return (
-        <button
-          onClick={() => handleChest()}
-          style={{
-            outline: "none",
-            marginLeft: chestPosW + "vw",
-            marginTop: chestPosH + "vh",
-            border: "none",
-            position: "absolute",
-            backgroundColor: "Transparent",
-          }}
-        >
-          {buttonText}
-          <img
-            alt="its a chest"
-            style={{
-              objectFit: "cover",
-              height: 3 + "vw",
-              width: 3 + "vw",
-            }}
-            src={treasureChest}
-          ></img>
-        </button>
-      );
-    } else return null;
+    return (
+      <div>
+        {transition((style, item) =>
+          item ? (
+            <animated.button
+              className="chest"
+              onClick={() => handleChest()}
+              style={style}
+            >
+              {buttonText}
+            </animated.button>
+          ) : (
+            <div></div>
+          )
+        )}
+      </div>
+    );
   } else return null;
 };
 export default Chests;

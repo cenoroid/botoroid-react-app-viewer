@@ -8,7 +8,7 @@ import ToggleButton from "./toggleButton";
 
 const RequestContainer = (props) => {
   const [requests, setRequests] = useState([]);
-  const [show, setShow] = useState(true);
+  const [show, setShow] = useState(false);
 
   useEffect(() => {
     props.socket.emit("getrequests");

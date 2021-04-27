@@ -4,7 +4,7 @@ import "./App.css";
 import axios from "axios";
 import io from "socket.io-client";
 //const API = "http://localhost:4000";
-const API = "https://botoroid-express-app.herokuapp.com";
+const API = "https://botoroid.xyz";
 const socket = io(API);
 const App = () => {
   const [page, setPage] = useState(<div></div>);

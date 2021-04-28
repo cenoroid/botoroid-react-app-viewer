@@ -53,7 +53,7 @@ const Chests = (props) => {
         chestPosH.current = Math.floor(Math.random() * 66) + 10;
         setShow(true);
         console.log(chestPosW.current);
-      }, Math.floor(Math.random() * 1200 + 3000));
+      }, Math.floor(Math.random() * 1200000 + 3000000));
     }
   }, [show]);
   function handleChest() {

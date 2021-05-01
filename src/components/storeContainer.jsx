@@ -4,15 +4,53 @@ import StoreFooter from "./storeFooter";
 import NewRedemption from "./newRedemption";
 import ToggleButton from "./toggleButton";
 import StoreHeader from "./storeHeader";
+import { useDragContainer } from "./useDragContainer";
 import axios from "axios";
 const StoreContainer = (props) => {
   const [redemptions, setRedemptions] = useState([]);
-  const [show, setShow] = useState(false);
+  const [show, setShow] = useState(true);
   const [newRedemption, setNewRedemption] = useState(null);
+  const [size, setSize] = useState();
+  const { pos, setPos, isDragging, bind } = useDragContainer({
+    x: 42,
+    y: 0,
+    blockedArea: props.blockedArea,
+    container: "store",
+  });
 
+  useEffect(() => {
+    setPos((prev) => ({ ...prev, blockedArea: props.blockedArea }));
+    // eslint-disable-next-line
+  }, [props.blockedArea]);
+  useEffect(() => {
+    if (!isDragging && size) {
+      props.onNewBlockedArea(
+        pos.translateX,
+        pos.translateY,
+        size.width,
+        size.height
+      );
+    }
+    // eslint-disable-next-line
+  }, [isDragging, size]);
+  useEffect(() => {
+    setPos((prev) => ({ ...prev, size }));
+    // eslint-disable-next-line
+  }, [size]);
+  function handleSize() {
+    setSize({
+      width:
+        (100 * document.getElementById("store").offsetWidth) /
+        window.innerWidth,
+      height:
+        (100 * document.getElementById("store").offsetHeight) /
+        window.innerHeight,
+    });
+  }
   useEffect(() => {
     axios.get(props.API + "/getredemptions").then((res) => {
       setRedemptions(res.data);
+      handleSize();
     });
     // eslint-disable-next-line
   }, []);
@@ -39,9 +77,18 @@ const StoreContainer = (props) => {
     if (show) {
       //max
       return (
-        <div>
+        <div
+          className="container"
+          id="store"
+          style={{
+            marginLeft: pos.translateX + "vw",
+            marginTop: pos.translateY + "vh",
+          }}
+        >
           <ToggleButton status={show} onToggle={handleToggle} />
-          <StoreHeader />
+          <div {...bind}>
+            <StoreHeader />
+          </div>
           <div className="storeContainer">
             {redemptions.map((redemption) => (
               <StoreRedemption

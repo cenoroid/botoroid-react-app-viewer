@@ -15,7 +15,7 @@ const Requests = (props) => {
   }
   return (
     <React.Fragment>
-      <p className="request" id={"id" + props.request.id}>
+      <div className="request" id={"id" + props.request.id}>
         {props.request.id}.{" "}
         <img
           className="icon"
@@ -23,9 +23,9 @@ const Requests = (props) => {
           src={defineIcon()}
           alt="its an icon"
         ></img>{" "}
-        <div className="requestMessage">{props.request.message}</div> -{" "}
-        <div className="requestName">{props.request.name}</div>
-      </p>
+        <p className="requestMessage">{props.request.message}</p> -{" "}
+        <p className="requestName">{props.request.name}</p>
+      </div>
     </React.Fragment>
   );
 };

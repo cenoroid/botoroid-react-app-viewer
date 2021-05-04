@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import _ from "lodash";
 import Requests from "./requests";
 import RequestListHeader from "./requestListHeader";
@@ -27,11 +27,13 @@ const RequestContainer = (props) => {
   });
   useEffect(() => {
     handleCollision();
+    // eslint-disable-next-line
   }, [blockedArea]);
   useEffect(() => {
     if (!_.isEqual(props.blockedArea, blockedArea)) {
       setBlockedArea(props.blockedArea);
     }
+    // eslint-disable-next-line
   }, [props.blockedArea]);
 
   useEffect(() => {
@@ -54,6 +56,7 @@ const RequestContainer = (props) => {
     if (props.dragging !== null) {
       resetAttached(props.dragging);
     }
+    // eslint-disable-next-line
   }, [props.dragging]);
   useEffect(() => {
     setPos((prev) => ({ ...prev, size }));

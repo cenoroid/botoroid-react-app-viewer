@@ -295,6 +295,7 @@ export const useDragContainer = (initialPos) => {
     if (attached.current === "bottom") {
       collisionCheck();
     }
+    // eslint-disable-next-line
   }, [pos.size]);
 
   const handleMouseMove = useCallback(

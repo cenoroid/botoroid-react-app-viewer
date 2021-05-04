@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import StoreRedemption from "./storeRedemption";
 import StoreFooter from "./storeFooter";
 import NewRedemption from "./newRedemption";
@@ -29,6 +29,7 @@ const StoreContainer = (props) => {
   });
   useEffect(() => {
     handleCollision();
+    // eslint-disable-next-line
   }, [blockedArea]);
   useEffect(() => {
     if (!_.isEqual(props.blockedArea, blockedArea)) {
@@ -57,6 +58,7 @@ const StoreContainer = (props) => {
     if (props.dragging !== null) {
       resetAttached(props.dragging);
     }
+    // eslint-disable-next-line
   }, [props.dragging]);
   function handleCollision() {
     let collisionArea = collisionCheck();

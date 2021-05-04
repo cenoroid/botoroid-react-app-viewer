@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import GoalsHeader from "./goalsHeader";
 import Goal from "./goal";
 import ToggleButton from "./toggleButton";
@@ -25,6 +25,7 @@ const GoalsContainer = (props) => {
   });
   useEffect(() => {
     handleCollision();
+    // eslint-disable-next-line
   }, [blockedArea]);
   useEffect(() => {
     if (!_.isEqual(props.blockedArea, blockedArea)) {
@@ -53,6 +54,7 @@ const GoalsContainer = (props) => {
     if (props.dragging !== null) {
       resetAttached(props.dragging);
     }
+    // eslint-disable-next-line
   }, [props.dragging]);
   function handleCollision() {
     let collisionArea = collisionCheck();

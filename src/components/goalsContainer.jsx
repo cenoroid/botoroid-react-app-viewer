@@ -1,35 +1,70 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import GoalsHeader from "./goalsHeader";
 import Goal from "./goal";
 import ToggleButton from "./toggleButton";
 import { useDragContainer } from "./useDragContainer";
-
+import _ from "lodash";
 const GoalsContainer = (props) => {
   const [goals, setGoals] = useState([]);
   const [show, setShow] = useState(true);
   const [size, setSize] = useState();
-  const { pos, setPos, isDragging, bind } = useDragContainer({
-    x: 21,
-    y: 0,
+  const {
+    pos,
+    setPos,
+    isDragging,
+    bind,
+    collisionCheck,
+    blockedArea,
+    setBlockedArea,
+    resetAttached,
+  } = useDragContainer({
+    x: 0,
+    y: 2,
     blockedArea: props.blockedArea,
     container: "goals",
   });
-
   useEffect(() => {
-    setPos((prev) => ({ ...prev, blockedArea: props.blockedArea }));
+    handleCollision();
+  }, [blockedArea]);
+  useEffect(() => {
+    if (!_.isEqual(props.blockedArea, blockedArea)) {
+      setBlockedArea(props.blockedArea);
+    }
     // eslint-disable-next-line
   }, [props.blockedArea]);
+
   useEffect(() => {
     if (!isDragging && size) {
+      props.onDragging(false);
       props.onNewBlockedArea(
         pos.translateX,
         pos.translateY,
         size.width,
         size.height
       );
+      handleCollision();
+    }
+    if (isDragging) {
+      props.onDragging("goals");
     }
     // eslint-disable-next-line
   }, [isDragging, size]);
+  useEffect(() => {
+    if (props.dragging !== null) {
+      resetAttached(props.dragging);
+    }
+  }, [props.dragging]);
+  function handleCollision() {
+    let collisionArea = collisionCheck();
+    if (collisionArea) {
+      props.onNewBlockedArea(
+        collisionArea.x,
+        collisionArea.y,
+        size.width,
+        size.height
+      );
+    }
+  }
   useEffect(() => {
     setPos((prev) => ({ ...prev, size }));
     // eslint-disable-next-line

@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-
+import React, { useState, useEffect, useRef } from "react";
+import _ from "lodash";
 import Requests from "./requests";
 import RequestListHeader from "./requestListHeader";
 import RequestListFooter from "./requestListFooter";
@@ -10,41 +10,73 @@ const RequestContainer = (props) => {
   const [requests, setRequests] = useState([]);
   const [show, setShow] = useState(true);
   const [size, setSize] = useState();
-  const { pos, setPos, isDragging, bind } = useDragContainer({
+  const {
+    pos,
+    setPos,
+    isDragging,
+    bind,
+    collisionCheck,
+    blockedArea,
+    setBlockedArea,
+    resetAttached,
+  } = useDragContainer({
     x: 0,
     y: 0,
     blockedArea: props.blockedArea,
     container: "requests",
   });
+  useEffect(() => {
+    handleCollision();
+  }, [blockedArea]);
+  useEffect(() => {
+    if (!_.isEqual(props.blockedArea, blockedArea)) {
+      setBlockedArea(props.blockedArea);
+    }
+  }, [props.blockedArea]);
 
   useEffect(() => {
-    setPos((prev) => ({ ...prev, blockedArea: props.blockedArea }));
-    // eslint-disable-next-line
-  }, [props.blockedArea]);
-  useEffect(() => {
     if (!isDragging && size) {
+      props.onDragging(false);
       props.onNewBlockedArea(
         pos.translateX,
         pos.translateY,
         size.width,
         size.height
       );
+      handleCollision();
+    }
+    if (isDragging) {
+      props.onDragging("requests");
     }
     // eslint-disable-next-line
   }, [isDragging, size]);
   useEffect(() => {
+    if (props.dragging !== null) {
+      resetAttached(props.dragging);
+    }
+  }, [props.dragging]);
+  useEffect(() => {
     setPos((prev) => ({ ...prev, size }));
+
     // eslint-disable-next-line
   }, [size]);
+  function handleCollision() {
+    let collisionArea = collisionCheck();
+    if (collisionArea) {
+      props.onNewBlockedArea(
+        collisionArea.x,
+        collisionArea.y,
+        size.width,
+        size.height
+      );
+    }
+  }
   useEffect(() => {
     handleSize();
     props.socket.emit("getrequests");
     props.socket.on("getrequests", (data) => {
-      if (data.length !== 0) {
-        console.log(data);
-        setRequests(data);
-        handleSize();
-      }
+      setRequests(data);
+      handleSize();
     });
     // eslint-disable-next-line
   }, []);

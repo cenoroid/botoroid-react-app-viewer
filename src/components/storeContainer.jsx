@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import StoreRedemption from "./storeRedemption";
 import StoreFooter from "./storeFooter";
 import NewRedemption from "./newRedemption";
@@ -6,33 +6,69 @@ import ToggleButton from "./toggleButton";
 import StoreHeader from "./storeHeader";
 import { useDragContainer } from "./useDragContainer";
 import axios from "axios";
+import _ from "lodash";
 const StoreContainer = (props) => {
   const [redemptions, setRedemptions] = useState([]);
   const [show, setShow] = useState(true);
   const [newRedemption, setNewRedemption] = useState(null);
   const [size, setSize] = useState();
-  const { pos, setPos, isDragging, bind } = useDragContainer({
-    x: 42,
-    y: 0,
+  const {
+    pos,
+    setPos,
+    isDragging,
+    bind,
+    collisionCheck,
+    blockedArea,
+    setBlockedArea,
+    resetAttached,
+  } = useDragContainer({
+    x: 0,
+    y: 3,
     blockedArea: props.blockedArea,
     container: "store",
   });
-
   useEffect(() => {
-    setPos((prev) => ({ ...prev, blockedArea: props.blockedArea }));
+    handleCollision();
+  }, [blockedArea]);
+  useEffect(() => {
+    if (!_.isEqual(props.blockedArea, blockedArea)) {
+      setBlockedArea(props.blockedArea);
+    }
     // eslint-disable-next-line
   }, [props.blockedArea]);
+
   useEffect(() => {
     if (!isDragging && size) {
+      props.onDragging(false);
       props.onNewBlockedArea(
         pos.translateX,
         pos.translateY,
         size.width,
         size.height
       );
+      handleCollision();
+    }
+    if (isDragging) {
+      props.onDragging("store");
     }
     // eslint-disable-next-line
   }, [isDragging, size]);
+  useEffect(() => {
+    if (props.dragging !== null) {
+      resetAttached(props.dragging);
+    }
+  }, [props.dragging]);
+  function handleCollision() {
+    let collisionArea = collisionCheck();
+    if (collisionArea) {
+      props.onNewBlockedArea(
+        collisionArea.x,
+        collisionArea.y,
+        size.width,
+        size.height
+      );
+    }
+  }
   useEffect(() => {
     setPos((prev) => ({ ...prev, size }));
     // eslint-disable-next-line
@@ -63,15 +99,24 @@ const StoreContainer = (props) => {
   const renderPage = () => {
     if (newRedemption !== null) {
       return (
-        <NewRedemption
-          onCurrencyUpdate={(value) => props.onCurrencyUpdate(value)}
-          socket={props.socket}
-          currency={props.currency}
-          user={props.user}
-          newRedemption={newRedemption}
-          onRedeem={handleRedeem}
-          API={props.API}
-        />
+        <div
+          className="container"
+          id="store"
+          style={{
+            marginLeft: pos.translateX + "vw",
+            marginTop: pos.translateY + "vh",
+          }}
+        >
+          <NewRedemption
+            onCurrencyUpdate={(value) => props.onCurrencyUpdate(value)}
+            socket={props.socket}
+            currency={props.currency}
+            user={props.user}
+            newRedemption={newRedemption}
+            onRedeem={handleRedeem}
+            API={props.API}
+          />
+        </div>
       );
     }
     if (show) {

@@ -7,14 +7,12 @@ const RequestListTimer = (props) => {
   useEffect(() => {
     props.socket.emit("gettimer");
     props.socket.on("starttimer", (resTimer, resTimerRunning) => {
-      console.log("yes");
       if (resTimer > 0) {
         setTimer(resTimer);
         setTimerRunning(resTimerRunning);
       }
     });
     props.socket.on("pausetimer", () => {
-      console.log("ok");
       setTimerRunning((prevState) => !prevState);
     });
     props.socket.on("stoptimer", () => {

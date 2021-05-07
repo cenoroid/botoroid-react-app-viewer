@@ -9,9 +9,9 @@ const Extention = (props) => {
   const [currency, setCurrency] = useState(props.currency);
   const [position, setPosition] = useState("left");
   const [showChests, setShowChests] = useState(true);
-  const [hovering, setHovering] = useState(true);
+  const [hovering, setHovering] = useState(false);
   const [blockedArea, setBlockedArea] = useState({
-    screen: { topY: 0, bottomY: 74, leftX: 0, rightX: 90 },
+    screen: { topY: 0, bottomY: 78, leftX: 0, rightX: 95 },
   });
   const [dragging, setDragging] = useState(null);
 

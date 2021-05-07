@@ -9,45 +9,39 @@ const Extention = (props) => {
   const [currency, setCurrency] = useState(props.currency);
   const [position, setPosition] = useState("left");
   const [showChests, setShowChests] = useState(true);
-  const [hovering, setHovering] = useState(false);
+  const [hovering, setHovering] = useState(true);
   const [blockedArea, setBlockedArea] = useState({
     screen: { topY: 0, bottomY: 74, leftX: 0, rightX: 80 },
   });
   const [dragging, setDragging] = useState(null);
 
-  function handleNewBlockedAreaRequests(x, y, width, height) {
+  function handleNewBlockedAreaRequests(zone) {
+    if (zone === undefined || zone === 0) {
+      return;
+    }
     setBlockedArea((prev) => ({
       ...prev,
-      requests: {
-        startX: x,
-        endX: x + width,
-        startY: y,
-        endY: y + height,
-      },
+      requests: zone,
     }));
   }
 
-  function handleNewBlockedAreaStore(x, y, width, height) {
+  function handleNewBlockedAreaStore(zone) {
+    if (zone === undefined || zone === 0) {
+      return;
+    }
     setBlockedArea((prev) => ({
       ...prev,
-      store: {
-        startX: x,
-        endX: x + width,
-        startY: y,
-        endY: y + height,
-      },
+      store: zone,
     }));
   }
 
-  function handleNewBlockedAreaGoals(x, y, width, height) {
+  function handleNewBlockedAreaGoals(zone) {
+    if (zone === undefined || zone === 0) {
+      return;
+    }
     setBlockedArea((prev) => ({
       ...prev,
-      goals: {
-        startX: x,
-        endX: x + width,
-        startY: y,
-        endY: y + height,
-      },
+      goals: zone,
     }));
   }
   useEffect(() => {
@@ -57,7 +51,6 @@ const Extention = (props) => {
     if (container) {
       setDragging(container);
     } else if (!container && dragging !== null) {
-      console.log(container);
       setDragging(null);
     }
   }
@@ -107,8 +100,8 @@ const Extention = (props) => {
             store: blockedArea.store,
             goals: blockedArea.goals,
           }}
-          onNewBlockedArea={(x, y, width, height) => {
-            handleNewBlockedAreaRequests(x, y, width, height);
+          onNewBlockedArea={(zone) => {
+            handleNewBlockedAreaRequests(zone);
           }}
           onDragging={(container) => handleDragging(container)}
           dragging={dragging}
@@ -120,9 +113,7 @@ const Extention = (props) => {
           user={props.user}
           onCurrencyUpdate={(value) => handleCurrencyUpdate(value)}
           API={props.API}
-          onNewBlockedArea={(x, y, width, height) =>
-            handleNewBlockedAreaStore(x, y, width, height)
-          }
+          onNewBlockedArea={(zone) => handleNewBlockedAreaStore(zone)}
           blockedArea={{
             screen: blockedArea.screen,
             requests: blockedArea.requests,
@@ -139,9 +130,7 @@ const Extention = (props) => {
           socket={props.socket}
           currency={currency}
           onCurrencyUpdate={(value) => handleCurrencyUpdate(value)}
-          onNewBlockedArea={(x, y, width, height) =>
-            handleNewBlockedAreaGoals(x, y, width, height)
-          }
+          onNewBlockedArea={(zone) => handleNewBlockedAreaGoals(zone)}
           blockedArea={{
             screen: blockedArea.screen,
             requests: blockedArea.requests,

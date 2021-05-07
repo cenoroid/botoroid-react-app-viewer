@@ -9,73 +9,57 @@ import { useDragContainer } from "./useDragContainer";
 const RequestContainer = (props) => {
   const [requests, setRequests] = useState([]);
   const [show, setShow] = useState(true);
-  const [size, setSize] = useState();
+
   const {
     pos,
-    setPos,
+
     isDragging,
     bind,
-    collisionCheck,
+
     blockedArea,
     setBlockedArea,
     resetAttached,
+    setSize,
+    ownBlockedArea,
   } = useDragContainer({
     x: 0,
     y: 0,
     blockedArea: props.blockedArea,
     container: "requests",
   });
+
   useEffect(() => {
-    handleCollision();
-    // eslint-disable-next-line
-  }, [blockedArea]);
-  useEffect(() => {
-    if (!_.isEqual(props.blockedArea, blockedArea)) {
+    if (
+      !_.isEqual(props.blockedArea, blockedArea) &&
+      props.blockedArea.hasOwnProperty("store") &&
+      props.blockedArea.hasOwnProperty("goals")
+    ) {
       setBlockedArea(props.blockedArea);
     }
     // eslint-disable-next-line
   }, [props.blockedArea]);
 
   useEffect(() => {
-    if (!isDragging && size) {
+    if (!isDragging) {
       props.onDragging(false);
-      props.onNewBlockedArea(
-        pos.translateX,
-        pos.translateY,
-        size.width,
-        size.height
-      );
-      handleCollision();
     }
     if (isDragging) {
       props.onDragging("requests");
     }
     // eslint-disable-next-line
-  }, [isDragging, size]);
+  }, [isDragging]);
   useEffect(() => {
     if (props.dragging !== null) {
       resetAttached(props.dragging);
     }
     // eslint-disable-next-line
   }, [props.dragging]);
-  useEffect(() => {
-    setPos((prev) => ({ ...prev, size }));
 
-    // eslint-disable-next-line
-  }, [size]);
-  function handleCollision() {
-    let collisionArea = collisionCheck();
-    if (collisionArea) {
-      props.onNewBlockedArea(
-        collisionArea.x,
-        collisionArea.y,
-        size.width,
-        size.height
-      );
-    }
-  }
   useEffect(() => {
-    handleSize();
+    props.onNewBlockedArea(ownBlockedArea);
+    // eslint-disable-next-line
+  }, [ownBlockedArea]);
+  useEffect(() => {
     props.socket.emit("getrequests");
     props.socket.on("getrequests", (data) => {
       setRequests(data);
@@ -96,18 +80,14 @@ const RequestContainer = (props) => {
   function handleToggle() {
     setShow(!show);
   }
-
+  useEffect(() => {
+    handleSize();
+    // eslint-disable-next-line
+  }, [show]);
   const renderPage = () => {
     if (show) {
       return (
-        <div
-          className="container"
-          id="requestList"
-          style={{
-            marginLeft: pos.translateX + "vw",
-            marginTop: pos.translateY + "vh",
-          }}
-        >
+        <div>
           <ToggleButton status={show} onToggle={handleToggle} />
           <div {...bind}>
             <RequestListHeader />
@@ -130,7 +110,18 @@ const RequestContainer = (props) => {
     }
     return null;
   };
-  return <div>{renderPage()}</div>;
+  return (
+    <div
+      className="container"
+      id="requestList"
+      style={{
+        marginLeft: pos.translateX + "vw",
+        marginTop: pos.translateY + "vh",
+      }}
+    >
+      {renderPage()}
+    </div>
+  );
 };
 
 export default RequestContainer;

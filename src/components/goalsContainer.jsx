@@ -7,70 +7,56 @@ import _ from "lodash";
 const GoalsContainer = (props) => {
   const [goals, setGoals] = useState([]);
   const [show, setShow] = useState(true);
-  const [size, setSize] = useState();
+
   const {
     pos,
-    setPos,
+
     isDragging,
     bind,
-    collisionCheck,
+
     blockedArea,
     setBlockedArea,
     resetAttached,
+    setSize,
+    ownBlockedArea,
   } = useDragContainer({
     x: 0,
     y: 2,
     blockedArea: props.blockedArea,
     container: "goals",
   });
+
   useEffect(() => {
-    handleCollision();
-    // eslint-disable-next-line
-  }, [blockedArea]);
-  useEffect(() => {
-    if (!_.isEqual(props.blockedArea, blockedArea)) {
+    if (
+      !_.isEqual(props.blockedArea, blockedArea) &&
+      props.blockedArea.hasOwnProperty("requests") &&
+      props.blockedArea.hasOwnProperty("store")
+    ) {
       setBlockedArea(props.blockedArea);
     }
     // eslint-disable-next-line
   }, [props.blockedArea]);
 
   useEffect(() => {
-    if (!isDragging && size) {
+    if (!isDragging) {
       props.onDragging(false);
-      props.onNewBlockedArea(
-        pos.translateX,
-        pos.translateY,
-        size.width,
-        size.height
-      );
-      handleCollision();
     }
     if (isDragging) {
       props.onDragging("goals");
     }
     // eslint-disable-next-line
-  }, [isDragging, size]);
+  }, [isDragging]);
   useEffect(() => {
     if (props.dragging !== null) {
       resetAttached(props.dragging);
     }
     // eslint-disable-next-line
   }, [props.dragging]);
-  function handleCollision() {
-    let collisionArea = collisionCheck();
-    if (collisionArea) {
-      props.onNewBlockedArea(
-        collisionArea.x,
-        collisionArea.y,
-        size.width,
-        size.height
-      );
-    }
-  }
   useEffect(() => {
-    setPos((prev) => ({ ...prev, size }));
+    props.onNewBlockedArea(ownBlockedArea);
     // eslint-disable-next-line
-  }, [size]);
+  }, [ownBlockedArea]);
+
   function handleSize() {
     setSize({
       width:
@@ -82,7 +68,6 @@ const GoalsContainer = (props) => {
     });
   }
   useEffect(() => {
-    handleSize();
     props.socket.emit("getgoals");
     props.socket.on("getgoals", (data) => {
       setGoals(data);
@@ -93,6 +78,10 @@ const GoalsContainer = (props) => {
   function handleToggle() {
     setShow(!show);
   }
+  useEffect(() => {
+    handleSize();
+    // eslint-disable-next-line
+  }, [show]);
   function handleGoalsUpdate(goalId, value) {
     let data = {
       idx: goalId - 1,
@@ -107,14 +96,7 @@ const GoalsContainer = (props) => {
   const renderPage = () => {
     if (show) {
       return (
-        <div
-          className="container"
-          id="goals"
-          style={{
-            marginTop: pos.translateY + "vh",
-            marginLeft: pos.translateX + "vw",
-          }}
-        >
+        <div>
           <ToggleButton status={show} onToggle={handleToggle} />
           <div {...bind}>
             <GoalsHeader />
@@ -139,7 +121,18 @@ const GoalsContainer = (props) => {
     }
     return null;
   };
-  return renderPage();
+  return (
+    <div
+      className="container"
+      id="goals"
+      style={{
+        marginTop: pos.translateY + "vh",
+        marginLeft: pos.translateX + "vw",
+      }}
+    >
+      {renderPage()}
+    </div>
+  );
 };
 
 export default GoalsContainer;

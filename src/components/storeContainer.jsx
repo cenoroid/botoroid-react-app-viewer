@@ -11,70 +11,52 @@ const StoreContainer = (props) => {
   const [redemptions, setRedemptions] = useState([]);
   const [show, setShow] = useState(true);
   const [newRedemption, setNewRedemption] = useState(null);
-  const [size, setSize] = useState();
+
   const {
     pos,
-    setPos,
+
     isDragging,
     bind,
-    collisionCheck,
+
     blockedArea,
     setBlockedArea,
     resetAttached,
+    setSize,
+    ownBlockedArea,
   } = useDragContainer({
     x: 0,
     y: 3,
     blockedArea: props.blockedArea,
     container: "store",
   });
+
   useEffect(() => {
-    handleCollision();
-    // eslint-disable-next-line
-  }, [blockedArea]);
-  useEffect(() => {
-    if (!_.isEqual(props.blockedArea, blockedArea)) {
+    if (
+      !_.isEqual(props.blockedArea, blockedArea) &&
+      props.blockedArea.hasOwnProperty("requests") &&
+      props.blockedArea.hasOwnProperty("goals")
+    ) {
       setBlockedArea(props.blockedArea);
     }
     // eslint-disable-next-line
   }, [props.blockedArea]);
 
   useEffect(() => {
-    if (!isDragging && size) {
+    if (!isDragging) {
       props.onDragging(false);
-      props.onNewBlockedArea(
-        pos.translateX,
-        pos.translateY,
-        size.width,
-        size.height
-      );
-      handleCollision();
     }
     if (isDragging) {
       props.onDragging("store");
     }
     // eslint-disable-next-line
-  }, [isDragging, size]);
+  }, [isDragging]);
   useEffect(() => {
     if (props.dragging !== null) {
       resetAttached(props.dragging);
     }
     // eslint-disable-next-line
   }, [props.dragging]);
-  function handleCollision() {
-    let collisionArea = collisionCheck();
-    if (collisionArea) {
-      props.onNewBlockedArea(
-        collisionArea.x,
-        collisionArea.y,
-        size.width,
-        size.height
-      );
-    }
-  }
-  useEffect(() => {
-    setPos((prev) => ({ ...prev, size }));
-    // eslint-disable-next-line
-  }, [size]);
+
   function handleSize() {
     setSize({
       width:
@@ -86,6 +68,10 @@ const StoreContainer = (props) => {
     });
   }
   useEffect(() => {
+    props.onNewBlockedArea(ownBlockedArea);
+    // eslint-disable-next-line
+  }, [ownBlockedArea]);
+  useEffect(() => {
     axios.get(props.API + "/getredemptions").then((res) => {
       setRedemptions(res.data);
       handleSize();
@@ -95,20 +81,17 @@ const StoreContainer = (props) => {
   function handleToggle() {
     setShow(!show);
   }
+  useEffect(() => {
+    handleSize();
+    // eslint-disable-next-line
+  }, [show]);
   function handleRedeem(redemption) {
     setNewRedemption(redemption);
   }
   const renderPage = () => {
     if (newRedemption !== null) {
       return (
-        <div
-          className="container"
-          id="store"
-          style={{
-            marginLeft: pos.translateX + "vw",
-            marginTop: pos.translateY + "vh",
-          }}
-        >
+        <div>
           <NewRedemption
             onCurrencyUpdate={(value) => props.onCurrencyUpdate(value)}
             socket={props.socket}
@@ -124,14 +107,7 @@ const StoreContainer = (props) => {
     if (show) {
       //max
       return (
-        <div
-          className="container"
-          id="store"
-          style={{
-            marginLeft: pos.translateX + "vw",
-            marginTop: pos.translateY + "vh",
-          }}
-        >
+        <div>
           <ToggleButton status={show} onToggle={handleToggle} />
           <div {...bind}>
             <StoreHeader />
@@ -160,6 +136,17 @@ const StoreContainer = (props) => {
     return null;
   };
 
-  return <div>{renderPage()}</div>;
+  return (
+    <div
+      className="container"
+      id="store"
+      style={{
+        marginLeft: pos.translateX + "vw",
+        marginTop: pos.translateY + "vh",
+      }}
+    >
+      {renderPage()}
+    </div>
+  );
 };
 export default StoreContainer;

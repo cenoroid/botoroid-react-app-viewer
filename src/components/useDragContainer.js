@@ -1,14 +1,15 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-
+import _ from "lodash";
 export const useDragContainer = (initialPos) => {
   const [pos, setPos] = useState({
     translateX: initialPos.x,
     translateY: initialPos.y,
     container: initialPos.container,
   });
+  const [size, setSize] = useState();
   const [blockedArea, setBlockedArea] = useState(initialPos.blockedArea);
   const [isDragging, setIsDragging] = useState(false);
-
+  const [ownBlockedArea, setOwnBlockedArea] = useState();
   const tempX = useRef();
   const tempY = useRef();
   const mouseX = useRef();
@@ -22,282 +23,363 @@ export const useDragContainer = (initialPos) => {
       ? "goals"
       : ""
   );
+  const posTemp = useRef();
+  const collisionInit = useRef();
+  const ownBlockedAreaTemp = useRef();
   function resetAttached(container) {
     if (container === attached.current) {
       attached.current = false;
     }
   }
+  useEffect(() => {
+    if (size) {
+      handleCollision();
+    }
+    // eslint-disable-next-line
+  }, [blockedArea]);
+  function handleCollision() {
+    if (!collisionInit.current) {
+      ownBlockedAreaTemp.current = {
+        startX: pos.translateX,
+        endX: pos.translateX + size.width,
+        startY: pos.translateY,
+        endY: pos.translateY + size.height,
+      };
+      posTemp.current = {
+        translateX: pos.translateX,
+        translateY: pos.translateY,
+      };
+    }
+    let collisionArea = collisionCheck();
+    if (collisionArea) {
+      ownBlockedAreaTemp.current = {
+        startX: collisionArea.x,
+        endX: collisionArea.x + size.width,
+        startY: collisionArea.y,
+        endY: collisionArea.y + size.height,
+      };
 
-  function collisionCheck() {
-    if (pos.size) {
-      if (!attached.current) {
-        if (
-          blockedArea.requests &&
-          pos.translateX > blockedArea.requests.startX - pos.size.width &&
-          pos.translateX < blockedArea.requests.endX &&
-          pos.translateY <= blockedArea.requests.endY &&
-          pos.translateY > blockedArea.requests.startY - pos.size.height
-        ) {
-          let x = blockedArea.requests.startX;
-          let y = blockedArea.requests.endY + 1;
-          if (y + pos.size.height >= blockedArea.screen.bottomY) {
-            if (x + pos.size.width >= blockedArea.screen.rightX) {
-              x = blockedArea.requests.startX - pos.size.width - 1;
-              setPos((prev) => ({
-                ...prev,
-                translateX: x,
-                translateY: blockedArea.screen.topY + 1,
-              }));
-              return {
-                y: blockedArea.screen.topY + 1,
-                x,
-              };
-            }
-            setPos((prev) => ({
-              ...prev,
-              translateX: blockedArea.requests.endX + 1,
-              translateY: blockedArea.screen.bottomY - pos.size.height - 1,
-            }));
-            return {
-              y: blockedArea.screen.bottomY - pos.size.height - 1,
-              x: blockedArea.requests.endX + 1,
-            };
-          }
-          setPos((prev) => ({
-            ...prev,
-            translateX: blockedArea.requests.startX,
-            translateY: blockedArea.requests.endY + 1,
-          }));
-          attached.current = "requests";
-          return {
-            y: blockedArea.requests.endY + 1,
-            x: blockedArea.requests.startX,
-          };
-        }
-        if (
-          blockedArea.goals &&
-          pos.translateX > blockedArea.goals.startX - pos.size.width &&
-          pos.translateX < blockedArea.goals.endX &&
-          pos.translateY <= blockedArea.goals.endY &&
-          pos.translateY > blockedArea.goals.startY - pos.size.height
-        ) {
-          if (pos.translateY + pos.size.height >= blockedArea.screen.bottomY) {
-            setPos((prev) => ({
-              ...prev,
-              translateX: blockedArea.goals.endX + 1,
-              translateY: blockedArea.screen.bottomY - pos.size.height - 1,
-            }));
-
-            return {
-              x: blockedArea.goals.endX + 1,
-              y: blockedArea.screen.bottomY - pos.size.height - 1,
-            };
-          }
-
-          setPos((prev) => ({
-            ...prev,
-            translateX: blockedArea.goals.startX,
-            translateY: blockedArea.goals.endY + 1,
-          }));
-          attached.current = "goals";
-          return {
-            y: blockedArea.goals.endY + 1,
-            x: blockedArea.goals.startX,
-          };
-        }
-        if (
-          blockedArea.store &&
-          pos.translateX > blockedArea.store.startX - pos.size.width &&
-          pos.translateX < blockedArea.store.endX &&
-          pos.translateY <= blockedArea.store.endY &&
-          pos.translateY > blockedArea.store.startY - pos.size.height
-        ) {
-          if (pos.translateY + pos.size.height >= blockedArea.screen.bottomY) {
-            setPos((prev) => ({
-              ...prev,
-              translateX: blockedArea.store.endX + 1,
-              translateY: blockedArea.screen.bottomY - pos.size.height - 1,
-            }));
-
-            return {
-              y: blockedArea.screen.bottomY - pos.size.height - 1,
-              x: blockedArea.store.endX + 1,
-            };
-          }
-          setPos((prev) => ({
-            ...prev,
-            translateX: blockedArea.store.startX,
-            translateY: blockedArea.store.endY + 1,
-          }));
-          attached.current = "store";
-          return {
-            y: blockedArea.store.endY + 1,
-            x: blockedArea.store.startX,
-          };
-        }
-        if (pos.translateY <= blockedArea.screen.topY) {
-          setPos((prev) => ({
-            ...prev,
-
-            translateY: blockedArea.screen.topY + 1,
-          }));
-
-          return {
-            y: blockedArea.screen.topY + 1,
-            x: pos.translateX,
-          };
-        }
-        if (pos.translateY + pos.size.height >= blockedArea.screen.bottomY) {
-          setPos((prev) => ({
-            ...prev,
-
-            translateY: blockedArea.screen.bottomY - pos.size.height - 1,
-          }));
-          attached.current = "bottom";
-          return {
-            y: blockedArea.screen.bottomY - pos.size.height - 1,
-            x: pos.translateX,
-          };
-        }
+      collisionInit.current = true;
+      handleCollision();
+    } else if (!collisionArea) {
+      collisionInit.current = false;
+      if (
+        pos.translateX !== posTemp.current.translateX ||
+        pos.translateY !== posTemp.current.translateY
+      ) {
+        setPos((prev) => ({
+          ...prev,
+          translateX: posTemp.current.translateX,
+          translateY: posTemp.current.translateY,
+        }));
+        setOwnBlockedArea({
+          startX: posTemp.current.translateX,
+          endX: posTemp.current.translateX + size.width,
+          startY: posTemp.current.translateY,
+          endY: posTemp.current.translateY + size.height,
+        });
       }
-      if (attached.current === "requests") {
-        if (pos.translateY + pos.size.height >= blockedArea.screen.bottomY) {
-          if (
-            blockedArea.requests.endX + pos.size.width + 1 >=
-            blockedArea.screen.rightX
-          ) {
-            setPos((prev) => ({
-              ...prev,
-              translateX: blockedArea.requests.startX - pos.size.width - 1,
+      if (!_.isEqual(ownBlockedArea, ownBlockedAreaTemp.current)) {
+        setOwnBlockedArea({
+          startX: posTemp.current.translateX,
+          endX: posTemp.current.translateX + size.width,
+          startY: posTemp.current.translateY,
+          endY: posTemp.current.translateY + size.height,
+        });
+      }
+    }
+  }
+  function collisionCheck() {
+    if (!size) {
+      return false;
+    }
+    if (!attached.current) {
+      if (
+        blockedArea.requests &&
+        posTemp.current.translateX > blockedArea.requests.startX - size.width &&
+        posTemp.current.translateX < blockedArea.requests.endX &&
+        posTemp.current.translateY <= blockedArea.requests.endY &&
+        posTemp.current.translateY > blockedArea.requests.startY - size.height
+      ) {
+        let x = blockedArea.requests.startX;
+        let y = blockedArea.requests.endY + 1;
+        if (y + size.height >= blockedArea.screen.bottomY) {
+          if (x + size.width >= blockedArea.screen.rightX) {
+            x = blockedArea.requests.startX - size.width - 1;
+            posTemp.current = {
+              translateX: x,
               translateY: blockedArea.screen.topY + 1,
-            }));
-            attached.current = false;
+            };
             return {
               y: blockedArea.screen.topY + 1,
-              x: blockedArea.requests.startX - pos.size.width - 1,
+              x,
             };
           }
-          setPos((prev) => ({
-            ...prev,
+          posTemp.current = {
             translateX: blockedArea.requests.endX + 1,
-            translateY: blockedArea.screen.topY + 1,
-          }));
-          attached.current = false;
+            translateY: blockedArea.screen.bottomY - size.height - 1,
+          };
+
           return {
-            y: blockedArea.screen.topY + 1,
+            y: blockedArea.screen.bottomY - size.height - 1,
             x: blockedArea.requests.endX + 1,
           };
         }
-        setPos((prev) => ({
-          ...prev,
+        posTemp.current = {
           translateX: blockedArea.requests.startX,
           translateY: blockedArea.requests.endY + 1,
-        }));
+        };
+
+        attached.current = "requests";
         return {
           y: blockedArea.requests.endY + 1,
           x: blockedArea.requests.startX,
         };
       }
-      if (attached.current === "goals") {
-        if (pos.translateY + pos.size.height >= blockedArea.screen.bottomY) {
-          if (
-            blockedArea.goals.endX + pos.size.width + 1 >=
-            blockedArea.screen.rightX
-          ) {
-            setPos((prev) => ({
-              ...prev,
-              translateX: blockedArea.requests.startX - pos.size.width - 1,
-              translateY: blockedArea.screen.topY + 1,
-            }));
-            attached.current = false;
-            return {
-              y: blockedArea.screen.topY + 1,
-              x: blockedArea.requests.startX - pos.size.width - 1,
-            };
-          }
-          setPos((prev) => ({
-            ...prev,
+      if (
+        blockedArea.goals &&
+        posTemp.current.translateX > blockedArea.goals.startX - size.width &&
+        posTemp.current.translateX < blockedArea.goals.endX &&
+        posTemp.current.translateY <= blockedArea.goals.endY &&
+        posTemp.current.translateY > blockedArea.goals.startY - size.height
+      ) {
+        if (
+          posTemp.current.translateY + size.height >=
+          blockedArea.screen.bottomY
+        ) {
+          posTemp.current = {
             translateX: blockedArea.goals.endX + 1,
-            translateY: blockedArea.screen.topY + 1,
-          }));
-          attached.current = false;
+            translateY: blockedArea.screen.bottomY - size.height - 1,
+          };
+
           return {
-            y: blockedArea.screen.topY + 1,
             x: blockedArea.goals.endX + 1,
+            y: blockedArea.screen.bottomY - size.height - 1,
           };
         }
-        setPos((prev) => ({
-          ...prev,
+
+        posTemp.current = {
           translateX: blockedArea.goals.startX,
           translateY: blockedArea.goals.endY + 1,
-        }));
+        };
+
+        attached.current = "goals";
         return {
           y: blockedArea.goals.endY + 1,
           x: blockedArea.goals.startX,
         };
       }
-      if (attached.current === "store") {
-        if (pos.translateY + pos.size.height >= blockedArea.screen.bottomY) {
-          if (
-            blockedArea.store.endX + pos.size.width + 1 >=
-            blockedArea.screen.rightX
-          ) {
-            setPos((prev) => ({
-              ...prev,
-              translateX: blockedArea.store.startX - pos.size.width - 1,
-              translateY: blockedArea.screen.topY + 1,
-            }));
-            attached.current = false;
-            return {
-              y: blockedArea.screen.topY + 1,
-              x: blockedArea.requests.startX - pos.size.width - 1,
-            };
-          }
-          setPos((prev) => ({
-            ...prev,
+      if (
+        blockedArea.store &&
+        posTemp.current.translateX > blockedArea.store.startX - size.width &&
+        posTemp.current.translateX < blockedArea.store.endX &&
+        posTemp.current.translateY <= blockedArea.store.endY &&
+        posTemp.current.translateY > blockedArea.store.startY - size.height
+      ) {
+        if (
+          posTemp.current.translateY + size.height >=
+          blockedArea.screen.bottomY
+        ) {
+          posTemp.current = {
             translateX: blockedArea.store.endX + 1,
-            translateY: blockedArea.screen.topY + 1,
-          }));
-          attached.current = false;
+            translateY: blockedArea.screen.bottomY - size.height - 1,
+          };
           return {
-            y: blockedArea.screen.topY + 1,
+            y: blockedArea.screen.bottomY - size.height - 1,
             x: blockedArea.store.endX + 1,
           };
         }
-
-        setPos((prev) => ({
-          ...prev,
+        posTemp.current = {
           translateX: blockedArea.store.startX,
           translateY: blockedArea.store.endY + 1,
-        }));
+        };
+        attached.current = "store";
         return {
           y: blockedArea.store.endY + 1,
           x: blockedArea.store.startX,
         };
       }
-      if (attached.current === "bottom") {
-        setPos((prev) => ({
-          ...prev,
-          translateY: blockedArea.screen.bottomY - pos.size.height - 1,
-        }));
+      if (posTemp.current.translateY <= blockedArea.screen.topY) {
+        posTemp.current = {
+          translateX: posTemp.current.translateX,
+
+          translateY: blockedArea.screen.topY + 1,
+        };
         return {
-          y: blockedArea.screen.bottomY - pos.size.height - 1,
-          x: pos.translateX,
+          y: blockedArea.screen.topY + 1,
+          x: posTemp.current.translateX,
+        };
+      }
+      if (
+        posTemp.current.translateY + size.height >=
+        blockedArea.screen.bottomY
+      ) {
+        posTemp.current = {
+          translateX: posTemp.current.translateX,
+          translateY: blockedArea.screen.bottomY - size.height - 1,
+        };
+        attached.current = "bottom";
+        return false;
+      }
+      if (
+        posTemp.current.translateX + size.width >=
+        blockedArea.screen.rightX
+      ) {
+        posTemp.current = {
+          translateX: blockedArea.screen.rightX - size.width - 1,
+          translateY: posTemp.current.translateY,
+        };
+        return {
+          x: blockedArea.screen.rightX - size.width - 1,
+          y: posTemp.current.translateY,
+        };
+      }
+      return false;
+    }
+    if (attached.current === "requests") {
+      if (!blockedArea.requests) {
+        return false;
+      }
+
+      if (
+        posTemp.current.translateY + size.height >=
+        blockedArea.screen.bottomY
+      ) {
+        if (
+          blockedArea.requests.endX + size.width + 1 >=
+          blockedArea.screen.rightX
+        ) {
+          posTemp.current = {
+            translateX: blockedArea.requests.startX - size.width - 1,
+            translateY: blockedArea.screen.topY + 1,
+          };
+          attached.current = false;
+          return {
+            y: blockedArea.screen.topY + 1,
+            x: blockedArea.requests.startX - size.width - 1,
+          };
+        }
+
+        posTemp.current = {
+          translateX: blockedArea.requests.endX + 1,
+          translateY: blockedArea.screen.topY + 1,
+        };
+        attached.current = false;
+        return {
+          y: blockedArea.screen.topY + 1,
+          x: blockedArea.requests.endX + 1,
         };
       }
 
+      posTemp.current = {
+        translateX: blockedArea.requests.startX,
+        translateY: blockedArea.requests.endY + 1,
+      };
+      return false;
+    }
+
+    if (attached.current === "goals") {
+      if (!blockedArea.goals) {
+        return false;
+      }
+      if (
+        posTemp.current.translateY + size.height >=
+        blockedArea.screen.bottomY
+      ) {
+        if (
+          blockedArea.goals.endX + size.width + 1 >=
+          blockedArea.screen.rightX
+        ) {
+          posTemp.current = {
+            translateX: blockedArea.requests.startX - size.width - 1,
+            translateY: blockedArea.screen.topY + 1,
+          };
+          attached.current = false;
+          return {
+            y: blockedArea.screen.topY + 1,
+            x: blockedArea.requests.startX - size.width - 1,
+          };
+        }
+
+        posTemp.current = {
+          translateX: blockedArea.goals.endX + 1,
+          translateY: blockedArea.screen.topY + 1,
+        };
+        attached.current = false;
+        return {
+          y: blockedArea.screen.topY + 1,
+          x: blockedArea.goals.endX + 1,
+        };
+      }
+
+      posTemp.current = {
+        translateX: blockedArea.goals.startX,
+        translateY: blockedArea.goals.endY + 1,
+      };
+      return false;
+    }
+    if (attached.current === "store") {
+      if (!blockedArea.store) {
+        return false;
+      }
+      if (
+        posTemp.current.translateY + size.height >=
+        blockedArea.screen.bottomY
+      ) {
+        if (
+          blockedArea.store.endX + size.width + 1 >=
+          blockedArea.screen.rightX
+        ) {
+          posTemp.current = {
+            translateX: blockedArea.store.startX - size.width - 1,
+            translateY: blockedArea.screen.topY + 1,
+          };
+          attached.current = false;
+          return {
+            y: blockedArea.screen.topY + 1,
+            x: blockedArea.requests.startX - size.width - 1,
+          };
+        }
+
+        posTemp.current = {
+          translateX: blockedArea.store.endX + 1,
+          translateY: blockedArea.screen.topY + 1,
+        };
+        attached.current = false;
+        return {
+          y: blockedArea.screen.topY + 1,
+          x: blockedArea.store.endX + 1,
+        };
+      }
+
+      posTemp.current = {
+        translateX: blockedArea.store.startX,
+        translateY: blockedArea.store.endY + 1,
+      };
+      return false;
+    }
+    if (attached.current === "bottom") {
+      posTemp.current = {
+        translateX: posTemp.current.translateX,
+        translateY: blockedArea.screen.bottomY - size.height - 1,
+      };
       return false;
     }
 
     return false;
   }
   useEffect(() => {
-    if (attached.current === "bottom") {
-      collisionCheck();
+    if (size) {
+      handleCollision();
     }
     // eslint-disable-next-line
-  }, [pos.size]);
-
+  }, [size]);
+  useEffect(() => {
+    if (!isDragging && size && ownBlockedArea) {
+      handleCollision();
+    }
+    // eslint-disable-next-line
+  }, [isDragging]);
   const handleMouseMove = useCallback(
     (e) => {
       if (isDragging) {
@@ -309,71 +391,132 @@ export const useDragContainer = (initialPos) => {
         let y =
           (100 * (e.pageY - tempY.current)) / e.view.innerHeight +
           pos.translateY;
-
+        posTemp.current.x = x;
+        posTemp.current.y = y;
         if (x === pos.translateX && y === pos.translateY) {
           return;
         }
         if (
           pos.container !== "requests" &&
-          x >= blockedArea.requests.startX - pos.size.width &&
+          x >= blockedArea.requests.startX - size.width &&
           x <= blockedArea.requests.endX &&
           y <= blockedArea.requests.endY &&
-          y >= blockedArea.requests.startY - pos.size.height
+          y >= blockedArea.requests.startY - size.height
         ) {
           if (mouseX.current < blockedArea.requests.startX) {
-            x = blockedArea.requests.startX - pos.size.width;
+            x = blockedArea.requests.startX - size.width;
           } else if (mouseX.current > blockedArea.requests.endX) {
             x = blockedArea.requests.endX;
           } else if (mouseY.current > blockedArea.requests.endY) {
             y = blockedArea.requests.endY;
           } else {
-            y = blockedArea.requests.startY - pos.size.height;
+            y = blockedArea.requests.startY - size.height;
           }
-        } else if (
+          if (pos.container !== "goals" && blockedArea.goals) {
+            [x, y] = draggingInGoals(x, y);
+          }
+          if (pos.container !== "store" && blockedArea.store) {
+            [x, y] = draggingInStore(x, y);
+          }
+        }
+        if (
           pos.container !== "store" &&
-          x >= blockedArea.store.startX - pos.size.width &&
+          x >= blockedArea.store.startX - size.width &&
           x <= blockedArea.store.endX &&
           y <= blockedArea.store.endY &&
-          y >= blockedArea.store.startY - pos.size.height
+          y >= blockedArea.store.startY - size.height
         ) {
           if (mouseX.current < blockedArea.store.startX) {
-            x = blockedArea.store.startX - pos.size.width;
+            x = blockedArea.store.startX - size.width;
           } else if (mouseX.current > blockedArea.store.endX) {
             x = blockedArea.store.endX;
           } else if (mouseY.current > blockedArea.store.endY) {
             y = blockedArea.store.endY;
           } else {
-            y = blockedArea.store.startY - pos.size.height;
+            y = blockedArea.store.startY - size.height;
           }
-        } else if (
-          pos.container !== "goals" &&
-          x >= blockedArea.goals.startX - pos.size.width &&
-          x <= blockedArea.goals.endX &&
-          y <= blockedArea.goals.endY &&
-          y >= blockedArea.goals.startY - pos.size.height
-        ) {
-          if (mouseX.current < blockedArea.goals.startX) {
-            x = blockedArea.goals.startX - pos.size.width;
-          } else if (mouseX.current > blockedArea.goals.endX) {
-            x = blockedArea.goals.endX;
-          } else if (mouseY.current > blockedArea.goals.endY) {
-            y = blockedArea.goals.endY;
-          } else {
-            y = blockedArea.goals.startY - pos.size.height;
+          if (pos.container !== "goals" && blockedArea.goals) {
+            [x, y] = draggingInGoals(x, y);
+          }
+          if (pos.container !== "requests" && blockedArea.requests) {
+            [x, y] = draggingInRequests(x, y);
           }
         }
-        if (y <= blockedArea.screen.topY) {
+        if (pos.container !== "goals") {
+          if (
+            x > blockedArea.goals.startX - size.width &&
+            x < blockedArea.goals.endX &&
+            y < blockedArea.goals.endY &&
+            y > blockedArea.goals.startY - size.height
+          ) {
+            if (mouseX.current < blockedArea.goals.startX) {
+              x = blockedArea.goals.startX - size.width;
+            } else if (mouseX.current > blockedArea.goals.endX) {
+              x = blockedArea.goals.endX;
+            } else if (mouseY.current > blockedArea.goals.endY) {
+              y = blockedArea.goals.endY;
+            } else {
+              y = blockedArea.goals.startY - size.height;
+            }
+            if (pos.container !== "store" && blockedArea.store) {
+              [x, y] = draggingInStore(x, y);
+            }
+            if (pos.container !== "requests" && blockedArea.requests) {
+              [x, y] = draggingInRequests(x, y);
+            }
+          }
+        }
+        if (y < blockedArea.screen.topY) {
           y = blockedArea.screen.topY;
+          if (pos.container !== "store" && blockedArea.store) {
+            [x, y] = draggingInStore(x, y);
+          }
+          if (pos.container !== "requests" && blockedArea.requests) {
+            [x, y] = draggingInRequests(x, y);
+          }
+          if (pos.container !== "goals" && blockedArea.goals) {
+            [x, y] = draggingInGoals(x, y);
+          }
         }
-        if (y + pos.size.height >= blockedArea.screen.bottomY) {
-          y = blockedArea.screen.bottomY - pos.size.height;
+        if (y + size.height > blockedArea.screen.bottomY) {
+          y = blockedArea.screen.bottomY - size.height;
+          if (pos.container !== "store" && blockedArea.store) {
+            [x, y] = draggingInStore(x, y);
+          }
+          if (pos.container !== "requests" && blockedArea.requests) {
+            [x] = draggingInRequests(x, y);
+          }
+          if (pos.container !== "goals" && blockedArea.goals) {
+            [x, y] = draggingInGoals(x, y);
+          }
         }
-        if (x + pos.size.width >= blockedArea.screen.rightX) {
-          x = blockedArea.screen.rightX - pos.size.width;
+        if (x + size.width > blockedArea.screen.rightX) {
+          mouseY.current = (100 * e.pageY) / e.view.innerHeight;
+          x = blockedArea.screen.rightX - size.width;
+          if (pos.container !== "store" && blockedArea.store) {
+            [x, y] = draggingInStore(x, y);
+          }
+          if (pos.container !== "requests" && blockedArea.requests) {
+            [x, y] = draggingInRequests(x, y);
+          }
+          if (pos.container !== "goals" && blockedArea.goals) {
+            [x, y] = draggingInGoals(x, y);
+          }
         }
-        if (x <= blockedArea.screen.leftX) {
+        if (x < blockedArea.screen.leftX) {
+          mouseY.current = (100 * e.pageY) / e.view.innerHeight;
           x = blockedArea.screen.leftX;
-        } else {
+          if (pos.container !== "store" && blockedArea.store) {
+            [x, y] = draggingInStore(x, y);
+          }
+          if (pos.container !== "requests" && blockedArea.requests) {
+            [x, y] = draggingInRequests(x, y);
+          }
+          if (pos.container !== "goals" && blockedArea.goals) {
+            [x, y] = draggingInGoals(x, y);
+          }
+        }
+        if (posTemp.current.x === x && posTemp.current.y === y) {
           mouseX.current = (100 * e.pageX) / e.view.innerWidth;
           mouseY.current = (100 * e.pageY) / e.view.innerHeight;
         }
@@ -388,6 +531,66 @@ export const useDragContainer = (initialPos) => {
     // eslint-disable-next-line
     [isDragging]
   );
+  function draggingInGoals(x, y) {
+    if (
+      x > blockedArea.goals.startX - size.width &&
+      x < blockedArea.goals.endX &&
+      y < blockedArea.goals.endY &&
+      y > blockedArea.goals.startY - size.height
+    ) {
+      if (mouseX.current < blockedArea.goals.startX) {
+        x = blockedArea.goals.startX - size.width;
+      } else if (mouseX.current > blockedArea.goals.endX) {
+        x = blockedArea.goals.endX;
+      } else if (mouseY.current > blockedArea.goals.endY) {
+        y = blockedArea.goals.endY;
+      } else {
+        y = blockedArea.goals.startY - size.height;
+      }
+    }
+
+    return [x, y];
+  }
+  function draggingInStore(x, y) {
+    if (
+      x > blockedArea.store.startX - size.width &&
+      x < blockedArea.store.endX &&
+      y < blockedArea.store.endY &&
+      y > blockedArea.store.startY - size.height
+    ) {
+      if (mouseX.current < blockedArea.store.startX) {
+        x = blockedArea.store.startX - size.width;
+      } else if (mouseX.current > blockedArea.store.endX) {
+        x = blockedArea.store.endX;
+      } else if (mouseY.current > blockedArea.store.endY) {
+        y = blockedArea.store.endY;
+      } else {
+        y = blockedArea.store.startY - size.height;
+      }
+    }
+
+    return [x, y];
+  }
+  function draggingInRequests(x, y) {
+    if (
+      x > blockedArea.requests.startX - size.width &&
+      x < blockedArea.requests.endX &&
+      y < blockedArea.requests.endY &&
+      y > blockedArea.requests.startY - size.height
+    ) {
+      if (mouseX.current < blockedArea.requests.startX) {
+        x = blockedArea.requests.startX - size.width;
+      } else if (mouseX.current > blockedArea.requests.endX) {
+        x = blockedArea.requests.endX;
+      } else if (mouseY.current > blockedArea.requests.endY) {
+        y = blockedArea.requests.endY;
+      } else {
+        y = blockedArea.requests.startY - size.height;
+      }
+    }
+
+    return [x, y];
+  }
   const handleMouseUp = useCallback(() => {
     if (isDragging) {
       setIsDragging(false);
@@ -428,5 +631,7 @@ export const useDragContainer = (initialPos) => {
     resetAttached: (container) => {
       resetAttached(container);
     },
+    setSize,
+    ownBlockedArea,
   };
 };

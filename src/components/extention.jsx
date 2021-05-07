@@ -11,7 +11,7 @@ const Extention = (props) => {
   const [showChests, setShowChests] = useState(true);
   const [hovering, setHovering] = useState(false);
   const [blockedArea, setBlockedArea] = useState({
-    screen: { topY: 0, bottomY: 78, leftX: 0, rightX: 95 },
+    screen: { topY: 0, bottomY: 80, leftX: 0, rightX: 95 },
   });
   const [dragging, setDragging] = useState(null);
 

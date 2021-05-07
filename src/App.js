@@ -18,8 +18,8 @@ const App = () => {
             setPage(
               <div>
                 <Extention
-                  user={"cenoroid"}
-                  currency={100}
+                  user={res.data.username}
+                  currency={res.data.currency}
                   socket={socket}
                   API={API}
                 />

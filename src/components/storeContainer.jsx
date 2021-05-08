@@ -4,61 +4,16 @@ import StoreFooter from "./storeFooter";
 import NewRedemption from "./newRedemption";
 import ToggleButton from "./toggleButton";
 import StoreHeader from "./storeHeader";
-import { useDragContainer } from "./useDragContainer";
+
 import axios from "axios";
-import _ from "lodash";
+
 const StoreContainer = (props) => {
   const [redemptions, setRedemptions] = useState([]);
   const [show, setShow] = useState(true);
   const [newRedemption, setNewRedemption] = useState(null);
 
-  const {
-    pos,
-
-    isDragging,
-    bind,
-
-    blockedArea,
-    setBlockedArea,
-    resetAttached,
-    setSize,
-    ownBlockedArea,
-  } = useDragContainer({
-    x: 0,
-    y: 3,
-    blockedArea: props.blockedArea,
-    container: "store",
-  });
-
-  useEffect(() => {
-    if (
-      !_.isEqual(props.blockedArea, blockedArea) &&
-      props.blockedArea.hasOwnProperty("requests") &&
-      props.blockedArea.hasOwnProperty("goals")
-    ) {
-      setBlockedArea(props.blockedArea);
-    }
-    // eslint-disable-next-line
-  }, [props.blockedArea]);
-
-  useEffect(() => {
-    if (!isDragging) {
-      props.onDragging(false);
-    }
-    if (isDragging) {
-      props.onDragging("store");
-    }
-    // eslint-disable-next-line
-  }, [isDragging]);
-  useEffect(() => {
-    if (props.dragging !== null) {
-      resetAttached(props.dragging);
-    }
-    // eslint-disable-next-line
-  }, [props.dragging]);
-
   function handleSize() {
-    setSize({
+    props.onSize({
       width:
         (100 * document.getElementById("store").offsetWidth) /
         window.innerWidth,
@@ -67,10 +22,7 @@ const StoreContainer = (props) => {
         window.innerHeight,
     });
   }
-  useEffect(() => {
-    props.onNewBlockedArea(ownBlockedArea);
-    // eslint-disable-next-line
-  }, [ownBlockedArea]);
+
   useEffect(() => {
     axios.get(props.API + "/getredemptions").then((res) => {
       setRedemptions(res.data);
@@ -109,7 +61,7 @@ const StoreContainer = (props) => {
       return (
         <div>
           <ToggleButton status={show} onToggle={handleToggle} />
-          <div {...bind}>
+          <div {...props.bind}>
             <StoreHeader />
           </div>
           <div className="storeContainer">
@@ -128,7 +80,9 @@ const StoreContainer = (props) => {
       return (
         <div>
           <ToggleButton status={show} onToggle={handleToggle} />
-          <StoreHeader />
+          <div {...props.bind}>
+            <StoreHeader />
+          </div>
           <StoreFooter user={props.user} currency={props.currency} />
         </div>
       );
@@ -136,17 +90,6 @@ const StoreContainer = (props) => {
     return null;
   };
 
-  return (
-    <div
-      className="container"
-      id="store"
-      style={{
-        marginLeft: pos.translateX + "vw",
-        marginTop: pos.translateY + "vh",
-      }}
-    >
-      {renderPage()}
-    </div>
-  );
+  return <div>{renderPage()}</div>;
 };
 export default StoreContainer;

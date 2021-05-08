@@ -24,7 +24,7 @@ export const useDragContainer = (initialPos) => {
       : ""
   );
   const posTemp = useRef();
-  const collisionInit = useRef();
+  const collisionInit = useRef(false);
   const ownBlockedAreaTemp = useRef();
   function resetAttached(container) {
     if (container === attached.current) {
@@ -50,6 +50,7 @@ export const useDragContainer = (initialPos) => {
         translateY: pos.translateY,
       };
     }
+
     let collisionArea = collisionCheck();
     if (collisionArea) {
       ownBlockedAreaTemp.current = {
@@ -96,23 +97,31 @@ export const useDragContainer = (initialPos) => {
     if (!attached.current) {
       if (
         blockedArea.requests &&
-        posTemp.current.translateX > blockedArea.requests.startX - size.width &&
-        posTemp.current.translateX < blockedArea.requests.endX &&
+        posTemp.current.translateX >=
+          blockedArea.requests.startX - size.width &&
+        posTemp.current.translateX <= blockedArea.requests.endX &&
         posTemp.current.translateY <= blockedArea.requests.endY &&
-        posTemp.current.translateY > blockedArea.requests.startY - size.height
+        posTemp.current.translateY >= blockedArea.requests.startY - size.height
       ) {
-        let x = blockedArea.requests.startX;
-        let y = blockedArea.requests.endY + 1;
-        if (y + size.height >= blockedArea.screen.bottomY) {
-          if (x + size.width >= blockedArea.screen.rightX) {
-            x = blockedArea.requests.startX - size.width - 1;
+        if (posTemp.current.translateY < blockedArea.requests.startY) {
+          return false;
+        }
+
+        if (
+          blockedArea.requests.endY + size.height >=
+          blockedArea.screen.bottomY
+        ) {
+          if (
+            blockedArea.requests.startX + size.width >=
+            blockedArea.screen.rightX
+          ) {
             posTemp.current = {
-              translateX: x,
+              translateX: blockedArea.requests.startX - size.width - 1,
               translateY: blockedArea.screen.topY + 1,
             };
             return {
               y: blockedArea.screen.topY + 1,
-              x,
+              x: blockedArea.requests.startX - size.width - 1,
             };
           }
           posTemp.current = {
@@ -138,15 +147,31 @@ export const useDragContainer = (initialPos) => {
       }
       if (
         blockedArea.goals &&
-        posTemp.current.translateX > blockedArea.goals.startX - size.width &&
-        posTemp.current.translateX < blockedArea.goals.endX &&
+        posTemp.current.translateX >= blockedArea.goals.startX - size.width &&
+        posTemp.current.translateX <= blockedArea.goals.endX &&
         posTemp.current.translateY <= blockedArea.goals.endY &&
-        posTemp.current.translateY > blockedArea.goals.startY - size.height
+        posTemp.current.translateY >= blockedArea.goals.startY - size.height
       ) {
+        if (posTemp.current.translateY < blockedArea.goals.startY) {
+          return false;
+        }
         if (
           posTemp.current.translateY + size.height >=
           blockedArea.screen.bottomY
         ) {
+          if (
+            blockedArea.goals.startX + size.width >=
+            blockedArea.screen.rightX
+          ) {
+            posTemp.current = {
+              translateX: blockedArea.goals.startX - size.width - 1,
+              translateY: blockedArea.screen.topY + 1,
+            };
+            return {
+              y: blockedArea.screen.topY + 1,
+              x: blockedArea.goals.startX - size.width - 1,
+            };
+          }
           posTemp.current = {
             translateX: blockedArea.goals.endX + 1,
             translateY: blockedArea.screen.bottomY - size.height - 1,
@@ -171,15 +196,31 @@ export const useDragContainer = (initialPos) => {
       }
       if (
         blockedArea.store &&
-        posTemp.current.translateX > blockedArea.store.startX - size.width &&
-        posTemp.current.translateX < blockedArea.store.endX &&
+        posTemp.current.translateX >= blockedArea.store.startX - size.width &&
+        posTemp.current.translateX <= blockedArea.store.endX &&
         posTemp.current.translateY <= blockedArea.store.endY &&
-        posTemp.current.translateY > blockedArea.store.startY - size.height
+        posTemp.current.translateY >= blockedArea.store.startY - size.height
       ) {
+        if (posTemp.current.translateY < blockedArea.store.startY) {
+          return false;
+        }
         if (
           posTemp.current.translateY + size.height >=
           blockedArea.screen.bottomY
         ) {
+          if (
+            blockedArea.store.startX + size.width >=
+            blockedArea.screen.rightX
+          ) {
+            posTemp.current = {
+              translateX: blockedArea.store.startX - size.width - 1,
+              translateY: blockedArea.screen.topY + 1,
+            };
+            return {
+              y: blockedArea.screen.topY + 1,
+              x: blockedArea.store.startX - size.width - 1,
+            };
+          }
           posTemp.current = {
             translateX: blockedArea.store.endX + 1,
             translateY: blockedArea.screen.bottomY - size.height - 1,

@@ -28,15 +28,15 @@ const App = () => {
           });
       } else {
         setPage(
-          <div style={{ width: "50vw", textAlign: "center" }}>
-            <div style={{ fontSize: 30 }}>
-              In order to use this extention,{<br></br>} you first need to grant
-              it access so it knows who you are
+          <div className="grantAccess">
+            <div style={{ color: "white", marginTop: "1vh" }}>
+              In order to use this extension,{<br></br>} you first need to grant
+              it access{<br></br>} so it knows who you are
             </div>
             <button
               style={{
-                height: 55,
-                width: 100,
+                height: "4vh",
+                width: "5vw",
               }}
               onClick={() => window.Twitch.ext.actions.requestIdShare()}
             >

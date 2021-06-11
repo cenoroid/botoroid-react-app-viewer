@@ -1,86 +1,73 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useTransition, animated } from "react-spring";
-import treasureChest from "./treasure.png";
+import { useSelector, useDispatch } from "react-redux";
+import { animated, useSpring } from "react-spring";
+import { chestClicked } from "../store/auth";
+import treasureChest from "./media/treasure.png";
 
 const Chests = (props) => {
+  const dispatch = useDispatch();
   const [show, setShow] = useState(false);
-  const [buttonText, setButtonText] = useState(
-    <img
-      alt="its a chest"
-      style={{
-        objectFit: "cover",
-        height: 3 + "vw",
-        width: 3 + "vw",
-      }}
-      src={treasureChest}
-    ></img>
-  );
-  //const [chestPosW, setChestPosW] = useState();
-  //const [chestPosH, setChestPosH] = useState();
-  const chestPosW = useRef(null);
-  const chestPosH = useRef(null);
-  const transition = useTransition(show, {
-    from: {
-      opacity: 0,
-    },
-    enter: {
-      marginLeft: chestPosW.current + "vw",
-      marginTop: chestPosH.current + "vh",
-      opacity: 1,
-    },
+  const [display, setDisplay] = useState(true);
+  const chests = useSelector((state) => state.settings.chests);
+  const timeout = useRef();
+  const transitionButton = useSpring({
+    opacity: show ? 1 : 0,
   });
+  const transitionDiv = useSpring({ opacity: show ? 1 : 0 });
 
   useEffect(() => {
-    setButtonText(
-      <img
-        alt="its a chest"
-        style={{
-          objectFit: "cover",
-          height: 3 + "vw",
-          width: 3 + "vw",
-        }}
-        src={treasureChest}
-      ></img>
-    );
     if (show) {
-      setTimeout(() => {
+      props.onChestCollission();
+      timeout.current = setTimeout(() => {
         setShow(false);
-      }, 5000);
+      }, chests.duration * 1000);
     }
-    if (!show) {
-      setTimeout(() => {
-        chestPosW.current = Math.floor(Math.random() * 76);
-        chestPosH.current = Math.floor(Math.random() * 66) + 10;
+    if (!show && chests) {
+      timeout.current = setTimeout(() => {
         setShow(true);
-        console.log(chestPosW.current);
-      }, Math.floor(Math.random() * 1200000 + 3000000));
+        setDisplay(true);
+      }, Math.floor(Math.random() * (chests.max - chests.min) * 60000 + chests.min * 60000));
     }
+    // eslint-disable-next-line
   }, [show]);
+
+  useEffect(() => {
+    if (!show) {
+      clearTimeout(timeout.current);
+      timeout.current = setTimeout(() => {
+        setShow(true);
+      }, Math.floor(Math.random() * (chests.max - chests.min) * 60000 + chests.min * 60000));
+    }
+    // eslint-disable-next-line
+  }, [chests]);
+
   function handleChest() {
-    setButtonText(<div>+1 cbuck</div>);
+    clearTimeout(timeout.current);
     setTimeout(() => {
-      props.onCurrencyUpdate(-1);
       setShow(false);
     }, 2000);
+    setDisplay(false);
+    dispatch(chestClicked());
   }
-  if (props.showChests) {
-    return (
-      <div>
-        {transition((style, item) =>
-          item ? (
-            <animated.button
-              className="chest"
-              onClick={() => handleChest()}
-              style={style}
-            >
-              {buttonText}
-            </animated.button>
-          ) : (
-            <div></div>
-          )
-        )}
-      </div>
-    );
-  } else return null;
+
+  return (
+    <div>
+      {display ? (
+        <animated.button
+          style={transitionButton}
+          className="chestButton"
+          onClick={handleChest}
+        >
+          <img className="chest" alt="its a chest" src={treasureChest}></img>
+        </animated.button>
+      ) : (
+        <animated.div style={transitionDiv}>
+          {"+ " +
+            chests.reward +
+            (chests.reward === 1 ? " cbuck!" : " cbucks!")}
+        </animated.div>
+      )}
+    </div>
+  );
 };
 export default Chests;

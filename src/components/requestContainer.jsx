@@ -1,23 +1,31 @@
 import React, { useState, useEffect } from "react";
-
-import Requests from "./requests";
-import RequestListHeader from "./requestListHeader";
-import RequestListFooter from "./requestListFooter";
-import RequestListTimer from "./requestListTimer";
+import { useDispatch, useSelector } from "react-redux";
+import { getRequests } from "../store/entities";
+import Request from "./requests/request";
+import RequestListHeader from "./requests/requestListHeader";
+import RequestListFooter from "./requests/requestListFooter";
+import RequestListTimer from "./requests/requestListTimer";
 import ToggleButton from "./toggleButton";
 
 const RequestContainer = (props) => {
-  const [requests, setRequests] = useState([]);
-  const [show, setShow] = useState(true);
+  const dispatch = useDispatch();
+  const [show, setShow] = useState(
+    useSelector((state) => state.settings.showContainer.requestList)
+  );
+  const [expand, setExpand] = useState(true);
+  const requests = useSelector((state) => state.entities.requests);
+  let { hovering } = props;
 
   useEffect(() => {
-    props.socket.emit("getrequests");
-    props.socket.on("getrequests", (data) => {
-      setRequests(data);
-      handleSize();
-    });
-    // eslint-disable-next-line
+    dispatch(getRequests());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    handleSize();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [show, expand, hovering, requests]);
+
   function handleSize() {
     props.onSize({
       width:
@@ -28,42 +36,54 @@ const RequestContainer = (props) => {
         window.innerHeight,
     });
   }
+
   function handleToggle() {
     setShow(!show);
   }
-  useEffect(() => {
-    handleSize();
-    // eslint-disable-next-line
-  }, [show]);
-  const renderPage = () => {
-    if (show) {
-      return (
-        <div>
-          <ToggleButton status={show} onToggle={handleToggle} />
-          <div {...props.bind}>
-            <RequestListHeader />
-          </div>
-          <RequestListTimer socket={props.socket} />
 
-          {requests.map((request) => (
-            <Requests key={request.id} request={request} />
-          ))}
-          <RequestListFooter requests={requests} />
-        </div>
-      );
-    } else if (props.hovering) {
-      return (
+  function handleExpand() {
+    setExpand(!expand);
+  }
+
+  return show ? (
+    <div>
+      <ToggleButton status={show} onToggle={handleToggle} />
+      <div {...props.bind}>
+        <RequestListHeader />
+      </div>
+      <RequestListTimer socket={props.socket} />
+      {requests.length !== 0 && (
         <div>
-          <ToggleButton status={show} onToggle={handleToggle} />
-          <div {...props.bind}>
-            <RequestListHeader />
-          </div>
+          <Request
+            onHover={handleSize}
+            key={requests[0].id}
+            request={requests[0]}
+          />
+          {expand && (
+            <div className="requestsContainer">
+              {requests.slice(1).map((request) => (
+                <Request
+                  onHover={handleSize}
+                  key={request.id}
+                  request={request}
+                />
+              ))}
+            </div>
+          )}
         </div>
-      );
-    }
-    return null;
-  };
-  return <div>{renderPage()}</div>;
+      )}
+      <RequestListFooter onExpand={handleExpand} expand={expand} />
+    </div>
+  ) : (
+    props.hovering && (
+      <div>
+        <ToggleButton status={show} onToggle={handleToggle} />
+        <div {...props.bind}>
+          <RequestListHeader />
+        </div>
+      </div>
+    )
+  );
 };
 
 export default RequestContainer;

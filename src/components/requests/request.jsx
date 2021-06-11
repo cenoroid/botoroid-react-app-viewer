@@ -1,9 +1,9 @@
 import React from "react";
-import youtubeIconImport from "./youtubeicon.png";
-import greyYoutubeIconImport from "./greyyoutubeicon.png";
-import gameIconImport from "./xboxicon.png";
+import youtubeIconImport from "../media/youtubeicon.png";
+import greyYoutubeIconImport from "../media/greyyoutubeicon.png";
+import gameIconImport from "../media/xboxicon.png";
 
-const Requests = (props) => {
+const Request = (props) => {
   function defineIcon() {
     if (props.request.subtype === "game request") {
       return gameIconImport;
@@ -13,9 +13,15 @@ const Requests = (props) => {
       return greyYoutubeIconImport;
     }
   }
+
   return (
-    <React.Fragment>
-      <div className="request" id={"id" + props.request.id}>
+    <div
+      className="request"
+      id={"id" + props.request.id}
+      onMouseOver={props.onHover}
+      onMouseOut={props.onHover}
+    >
+      <div className="requestMessage">
         {props.request.id}.{" "}
         <img
           className="icon"
@@ -23,11 +29,11 @@ const Requests = (props) => {
           src={defineIcon()}
           alt="its an icon"
         ></img>{" "}
-        <p className="requestMessage">{props.request.message}</p> -{" "}
-        <p className="requestName">{props.request.name}</p>
+        {props.request.message}
       </div>
-    </React.Fragment>
+      <div className="requestName">{"- " + props.request.name}</div>
+    </div>
   );
 };
 
-export default Requests;
+export default Request;

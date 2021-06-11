@@ -1,16 +1,16 @@
 import React from "react";
 
-const StoreRedemption = (props) => {
+const Redemption = (props) => {
   return (
     <div>
       <button
         className="redemption"
         onClick={() => props.onRedeem(props.redemption)}
       >
-        {props.redemption.type} : {props.redemption.cost}
+        {props.redemption.type}
       </button>
     </div>
   );
 };
 
-export default StoreRedemption;
+export default Redemption;

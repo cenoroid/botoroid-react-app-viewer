@@ -1,0 +1,88 @@
+{
+  "allowHttpBackend": false,
+  "backendCommand": "",
+  "backendFolderName": "",
+  "certificateExceptions": [],
+  "extensionViews": [
+    {
+      "channelId": "40068379",
+      "configurationAnchor": "video_overlay",
+      "displayChannelName": "cenoroid",
+      "features": {
+        "isBitsEnabled": false,
+        "isChatEnabled": false,
+        "isSubscriptionStatusAvailable": false
+      },
+      "frameSize": {
+        "width": 1280,
+        "height": 720
+      },
+      "id": "2",
+      "isPopout": false,
+      "label": "",
+      "linked": true,
+      "linkedUserId": "40068379",
+      "orientation": "Portrait",
+      "type": "video_overlay",
+      "viewerType": "Logged-In Viewer"
+    }
+  ],
+  "manifest": {
+    "anchor": "video_overlay",
+    "assetUrls": [],
+    "authorName": "Cenoroid",
+    "bitsEnabled": false,
+    "canInstall": true,
+    "configUrl": "https://qy20qat73227523q6ihcrjhuup9ywc.ext-twitch.tv/qy20qat73227523q6ihcrjhuup9ywc/0.0.2/f96ad8bdc5600a09aa3139e89ee0f56f/config.html",
+    "configurationLocation": "none",
+    "description": "This extension manages loyalty points and provides ways to spend them like community goals, game or video requests... The currency is called cbucks and you can get them by converting channel points, winning raffles, subscribing cheering or donating.\n",
+    "eulaTosUrl": "",
+    "hasChatSupport": false,
+    "iconUrl": "https://extensions-discovery-images.twitch.tv/qy20qat73227523q6ihcrjhuup9ywc/0.0.1/logoa3d2f16a-5e3c-49a4-888c-91919f3720c9",
+    "iconUrls": {
+      "100x100": "https://extensions-discovery-images.twitch.tv/qy20qat73227523q6ihcrjhuup9ywc/0.0.1/logoa3d2f16a-5e3c-49a4-888c-91919f3720c9",
+      "24x24": "https://extensions-discovery-images.twitch.tv/qy20qat73227523q6ihcrjhuup9ywc/0.0.1/taskbar167e0f11-ef4b-4bb0-aaff-ed3b663ed91b",
+      "300x200": "https://extensions-discovery-images.twitch.tv/qy20qat73227523q6ihcrjhuup9ywc/0.0.1/discovery95df0ab9-2500-4111-9147-ffd96bc7e78a"
+    },
+    "id": "qy20qat73227523q6ihcrjhuup9ywc",
+    "installationCount": -42,
+    "liveConfigUrl": "",
+    "name": "Botoroid Is Here",
+    "panelHeight": 0,
+    "privacyPolicyUrl": "",
+    "requestIdentityLink": true,
+    "requiredBroadcasterAbilities": [],
+    "screenshotUrls": [
+      "https://extensions-discovery-images.twitch.tv/qy20qat73227523q6ihcrjhuup9ywc/0.0.1/screenshot5ceec01b-f335-47bb-ba47-77cf39dd668a"
+    ],
+    "sku": "",
+    "state": "Assets Uploaded",
+    "subscriptionsSupportLevel": "none",
+    "summary": "Community Extension to manage currency, goals and events.",
+    "supportEmail": "almostwar@gmail.com",
+    "vendorCode": "",
+    "version": "0.0.2",
+    "viewerSummary": "Get cbucks by converting channel points, winning raffles, subscribing cheering or donating. Spend your cbucks on goals or redemptions!",
+    "viewerUrl": "",
+    "viewerUrls": {
+      "videoOverlay": "https://qy20qat73227523q6ihcrjhuup9ywc.ext-twitch.tv/qy20qat73227523q6ihcrjhuup9ywc/0.0.2/f96ad8bdc5600a09aa3139e89ee0f56f/index.html"
+    },
+    "views": {
+      "videoOverlay": {
+        "viewerUrl": "https://qy20qat73227523q6ihcrjhuup9ywc.ext-twitch.tv/qy20qat73227523q6ihcrjhuup9ywc/0.0.2/f96ad8bdc5600a09aa3139e89ee0f56f/index.html",
+        "canLinkExternalContent": false
+      },
+      "config": {
+        "viewerUrl": "https://qy20qat73227523q6ihcrjhuup9ywc.ext-twitch.tv/qy20qat73227523q6ihcrjhuup9ywc/0.0.2/f96ad8bdc5600a09aa3139e89ee0f56f/config.html",
+        "canLinkExternalContent": false
+      }
+    },
+    "whitelistedConfigUrls": [],
+    "whitelistedPanelUrls": []
+  },
+  "frontendCommand": "",
+  "frontendFolderName": "",
+  "name": "Botoroid Is Here",
+  "usingRandomFrontendHostingPort": false,
+  "version": 3
+}

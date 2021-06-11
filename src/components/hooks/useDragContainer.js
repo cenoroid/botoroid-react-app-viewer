@@ -6,7 +6,9 @@ export const useDragContainer = (initialPos) => {
     translateY: initialPos.y,
     container: initialPos.container,
   });
-  const [size, setSize] = useState();
+  const [size, setSize] = useState(
+    pos.container === "chest" ? { width: 2, height: 4.5 } : null
+  );
   const [blockedArea, setBlockedArea] = useState(initialPos.blockedArea);
   const [isDragging, setIsDragging] = useState(false);
   const [ownBlockedArea, setOwnBlockedArea] = useState();
@@ -21,22 +23,45 @@ export const useDragContainer = (initialPos) => {
       ? "none"
       : pos.container === "store"
       ? "goals"
-      : ""
+      : false
   );
   const posTemp = useRef();
   const collisionInit = useRef(false);
   const ownBlockedAreaTemp = useRef();
+  let chestCollissionCheck;
   function resetAttached(container) {
     if (container === attached.current) {
       attached.current = false;
     }
   }
   useEffect(() => {
-    if (size) {
+    if (size && pos.container !== "chest") {
       handleCollision();
     }
     // eslint-disable-next-line
   }, [blockedArea]);
+
+  function chestCollission() {
+    if (blockedArea) {
+      posTemp.current = {
+        translateX: Math.floor(Math.random() * 96),
+        translateY: Math.floor(Math.random() * 86),
+      };
+      attached.current = false;
+      let collissionArea = collisionCheck();
+
+      if (collissionArea) {
+        chestCollission();
+      } else {
+        setPos((prev) => ({
+          ...prev,
+          translateX: posTemp.current.translateX,
+          translateY: posTemp.current.translateY,
+        }));
+      }
+    }
+  }
+
   function handleCollision() {
     if (!collisionInit.current) {
       ownBlockedAreaTemp.current = {
@@ -97,12 +122,15 @@ export const useDragContainer = (initialPos) => {
     if (!attached.current) {
       if (
         blockedArea.requests &&
-        posTemp.current.translateX >=
-          blockedArea.requests.startX - size.width &&
-        posTemp.current.translateX <= blockedArea.requests.endX &&
+        posTemp.current.translateX > blockedArea.requests.startX - size.width &&
+        posTemp.current.translateX < blockedArea.requests.endX &&
         posTemp.current.translateY <= blockedArea.requests.endY &&
         posTemp.current.translateY >= blockedArea.requests.startY - size.height
       ) {
+        if (pos.container === "chest") {
+          return true;
+        }
+
         if (posTemp.current.translateY < blockedArea.requests.startY) {
           return false;
         }
@@ -112,7 +140,7 @@ export const useDragContainer = (initialPos) => {
           blockedArea.screen.bottomY
         ) {
           if (
-            blockedArea.requests.startX + size.width >=
+            blockedArea.requests.startX + size.width >
             blockedArea.screen.rightX
           ) {
             posTemp.current = {
@@ -147,11 +175,15 @@ export const useDragContainer = (initialPos) => {
       }
       if (
         blockedArea.goals &&
-        posTemp.current.translateX >= blockedArea.goals.startX - size.width &&
-        posTemp.current.translateX <= blockedArea.goals.endX &&
+        posTemp.current.translateX > blockedArea.goals.startX - size.width &&
+        posTemp.current.translateX < blockedArea.goals.endX &&
         posTemp.current.translateY <= blockedArea.goals.endY &&
         posTemp.current.translateY >= blockedArea.goals.startY - size.height
       ) {
+        if (pos.container === "chest") {
+          return true;
+        }
+
         if (posTemp.current.translateY < blockedArea.goals.startY) {
           return false;
         }
@@ -196,11 +228,14 @@ export const useDragContainer = (initialPos) => {
       }
       if (
         blockedArea.store &&
-        posTemp.current.translateX >= blockedArea.store.startX - size.width &&
-        posTemp.current.translateX <= blockedArea.store.endX &&
+        posTemp.current.translateX > blockedArea.store.startX - size.width &&
+        posTemp.current.translateX < blockedArea.store.endX &&
         posTemp.current.translateY <= blockedArea.store.endY &&
         posTemp.current.translateY >= blockedArea.store.startY - size.height
       ) {
+        if (pos.container === "chest") {
+          return true;
+        }
         if (posTemp.current.translateY < blockedArea.store.startY) {
           return false;
         }
@@ -275,6 +310,7 @@ export const useDragContainer = (initialPos) => {
           y: posTemp.current.translateY,
         };
       }
+
       return false;
     }
     if (attached.current === "requests") {
@@ -410,7 +446,7 @@ export const useDragContainer = (initialPos) => {
     return false;
   }
   useEffect(() => {
-    if (size) {
+    if (size && pos.container !== "chest") {
       handleCollision();
     }
     // eslint-disable-next-line
@@ -639,6 +675,7 @@ export const useDragContainer = (initialPos) => {
   }, [isDragging]);
   const handleMouseDown = useCallback((e) => {
     e.preventDefault();
+
     tempX.current = e.pageX;
     tempY.current = e.pageY;
     setIsDragging(true);
@@ -674,5 +711,9 @@ export const useDragContainer = (initialPos) => {
     },
     setSize,
     ownBlockedArea,
+    chestCollission: (x, y) => {
+      chestCollission(x, y);
+    },
+    chestCollissionCheck,
   };
 };

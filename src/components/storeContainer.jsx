@@ -1,16 +1,30 @@
 import React, { useState, useEffect } from "react";
-import StoreRedemption from "./storeRedemption";
-import StoreFooter from "./storeFooter";
-import NewRedemption from "./newRedemption";
+import { useSelector, useDispatch } from "react-redux";
+import { getRedemptions } from "../store/entities";
+import Redemption from "./redemptions/redemption";
+import StoreFooter from "./redemptions/storeFooter";
+import NewRedemption from "./redemptions/newRedemption";
 import ToggleButton from "./toggleButton";
-import StoreHeader from "./storeHeader";
-
-import axios from "axios";
+import StoreHeader from "./redemptions/storeHeader";
 
 const StoreContainer = (props) => {
-  const [redemptions, setRedemptions] = useState([]);
-  const [show, setShow] = useState(true);
+  const dispatch = useDispatch();
+  const redemptions = useSelector((state) => state.entities.redemptions);
+  const [show, setShow] = useState(
+    useSelector((state) => state.settings.showContainer.store)
+  );
   const [newRedemption, setNewRedemption] = useState(null);
+  let { hovering } = props;
+
+  useEffect(() => {
+    dispatch(getRedemptions());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    handleSize();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [show, hovering, newRedemption, redemptions]);
 
   function handleSize() {
     props.onSize({
@@ -23,73 +37,45 @@ const StoreContainer = (props) => {
     });
   }
 
-  useEffect(() => {
-    axios.get(props.API + "/getredemptions").then((res) => {
-      setRedemptions(res.data);
-      handleSize();
-    });
-    // eslint-disable-next-line
-  }, []);
   function handleToggle() {
     setShow(!show);
   }
-  useEffect(() => {
-    handleSize();
-    // eslint-disable-next-line
-  }, [show]);
-  function handleRedeem(redemption) {
-    setNewRedemption(redemption);
-  }
-  const renderPage = () => {
-    if (newRedemption !== null) {
-      return (
-        <div>
-          <NewRedemption
-            onCurrencyUpdate={(value) => props.onCurrencyUpdate(value)}
-            socket={props.socket}
-            currency={props.currency}
-            user={props.user}
-            newRedemption={newRedemption}
-            onRedeem={handleRedeem}
-            API={props.API}
-          />
-        </div>
-      );
-    }
-    if (show) {
-      //max
-      return (
+
+  return (
+    <div>
+      {newRedemption !== null ? (
+        <NewRedemption
+          newRedemption={newRedemption}
+          onRedeem={setNewRedemption}
+        />
+      ) : show ? (
         <div>
           <ToggleButton status={show} onToggle={handleToggle} />
           <div {...props.bind}>
             <StoreHeader />
           </div>
-          <div className="storeContainer">
+          <div className="redemptionsContainer">
             {redemptions.map((redemption) => (
-              <StoreRedemption
+              <Redemption
                 key={redemption.id}
                 redemption={redemption}
-                onRedeem={handleRedeem}
+                onRedeem={setNewRedemption}
               />
             ))}
           </div>
-          <StoreFooter user={props.user} currency={props.currency} />
         </div>
-      );
-    } else if (props.hovering) {
-      return (
-        <div>
-          <ToggleButton status={show} onToggle={handleToggle} />
-          <div {...props.bind}>
-            <StoreHeader />
+      ) : (
+        props.hovering && (
+          <div>
+            <ToggleButton status={show} onToggle={handleToggle} />
+            <div {...props.bind}>
+              <StoreHeader />
+            </div>
           </div>
-          <StoreFooter user={props.user} currency={props.currency} />
-        </div>
-      );
-    }
-    return null;
-  };
-
-  return <div>{renderPage()}</div>;
+        )
+      )}
+      {props.hovering || (show && <StoreFooter />)}
+    </div>
+  );
 };
 export default StoreContainer;

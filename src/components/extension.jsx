@@ -3,13 +3,9 @@ import RequestContainer from "./requestContainer";
 import GoalsContainer from "./goalsContainer";
 import StoreContainer from "./storeContainer";
 import Chests from "./chests";
-import Settings from "./settings";
-import { useDragContainer } from "./useDragContainer";
-const Extention = (props) => {
-  const [currency, setCurrency] = useState(props.currency);
-  const [position, setPosition] = useState("left");
-  const [showChests, setShowChests] = useState(true);
-  const [hovering, setHovering] = useState(false);
+import { useDragContainer } from "./hooks/useDragContainer";
+
+const Extension = (props) => {
   const [blockedArea, setBlockedArea] = useState({
     screen: { topY: 0, bottomY: 88, leftX: 0, rightX: 98 },
   });
@@ -23,7 +19,7 @@ const Extention = (props) => {
     ownBlockedArea: ownBlockedAreaRequests,
   } = useDragContainer({
     x: 0,
-    y: 2,
+    y: 0,
     container: "requests",
   });
   const {
@@ -36,7 +32,7 @@ const Extention = (props) => {
     ownBlockedArea: ownBlockedAreaGoals,
   } = useDragContainer({
     x: 0,
-    y: 2,
+    y: 3,
     container: "goals",
   });
   const {
@@ -49,8 +45,17 @@ const Extention = (props) => {
     ownBlockedArea: ownBlockedAreaStore,
   } = useDragContainer({
     x: 0,
-    y: 2,
+    y: 6,
     container: "store",
+  });
+  const {
+    pos: posChest,
+    setBlockedArea: setBlockedAreaChests,
+    chestCollission,
+  } = useDragContainer({
+    x: -4,
+    y: 0,
+    container: "chest",
   });
 
   useEffect(() => {
@@ -94,88 +99,25 @@ const Extention = (props) => {
       requests: blockedArea.requests,
       goals: blockedArea.goals,
     });
+    setBlockedAreaChests(blockedArea);
     // eslint-disable-next-line
   }, [blockedArea]);
+
   function handleSizeRequests(width, height) {
     setSizeRequests(width, height);
   }
+
   function handleSizeGoals(width, height) {
     setSizeGoals(width, height);
   }
+
   function handleSizeStore(width, height) {
     setSizeStore(width, height);
   }
 
-  function handleNewBlockedAreaRequests(zone) {
-    if (zone === undefined || zone === 0) {
-      return;
-    }
-    setBlockedArea((prev) => ({
-      ...prev,
-      requests: zone,
-    }));
-  }
-
-  function handleNewBlockedAreaStore(zone) {
-    if (zone === undefined || zone === 0) {
-      return;
-    }
-    setBlockedArea((prev) => ({
-      ...prev,
-      store: zone,
-    }));
-  }
-
-  function handleNewBlockedAreaGoals(zone) {
-    if (zone === undefined || zone === 0) {
-      return;
-    }
-    setBlockedArea((prev) => ({
-      ...prev,
-      goals: zone,
-    }));
-  }
-  // useEffect(() => {
-  //   console.log("yesmany");
-  // });
-
-  useEffect(() => {
-    props.socket.on("updatecurrency", (data) => {
-      setCurrency(currency + data);
-    });
-    // eslint-disable-next-line
-  }, []);
-
-  window.Twitch.ext.onContext((object) => {
-    if (object.arePlayerControlsVisible && !hovering) {
-      setHovering(true);
-    } else if (!object.arePlayerControlsVisible && hovering) {
-      setHovering(false);
-    }
-  });
-
-  function handleChangeSides() {
-    if (position === "left") {
-      setPosition("right");
-    } else {
-      setPosition("left");
-    }
-  }
-  function handleCurrencyUpdate(value) {
-    setCurrency(currency - value);
-  }
-  function handleChestPlus() {
-    props.socket.emit("updatecurrency", {
-      username: props.user,
-      value: 1,
-    });
-  }
-  function handleToggleChests() {
-    setShowChests((prevState) => !prevState);
-  }
   return (
     <div>
-      <div className="mainContainer" style={{ float: position }}>
+      <div className="mainContainer">
         <div
           className="container"
           id="requestList"
@@ -185,17 +127,7 @@ const Extention = (props) => {
           }}
         >
           <RequestContainer
-            socket={props.socket}
-            API={props.API}
-            hovering={hovering}
-            blockedArea={{
-              screen: blockedArea.screen,
-              store: blockedArea.store,
-              goals: blockedArea.goals,
-            }}
-            onNewBlockedArea={(zone) => {
-              handleNewBlockedAreaRequests(zone);
-            }}
+            hovering={props.hovering}
             bind={bindRequests}
             onSize={(width, height) => handleSizeRequests(width, height)}
           />
@@ -209,18 +141,7 @@ const Extention = (props) => {
           }}
         >
           <GoalsContainer
-            hovering={hovering}
-            user={props.user}
-            API={props.API}
-            socket={props.socket}
-            currency={currency}
-            onCurrencyUpdate={(value) => handleCurrencyUpdate(value)}
-            onNewBlockedArea={(zone) => handleNewBlockedAreaGoals(zone)}
-            blockedArea={{
-              screen: blockedArea.screen,
-              requests: blockedArea.requests,
-              store: blockedArea.store,
-            }}
+            hovering={props.hovering}
             bind={bindGoals}
             onSize={(width, height) => handleSizeGoals(width, height)}
           />
@@ -234,35 +155,23 @@ const Extention = (props) => {
           }}
         >
           <StoreContainer
-            hovering={hovering}
-            socket={props.socket}
-            currency={currency}
-            user={props.user}
-            onCurrencyUpdate={(value) => handleCurrencyUpdate(value)}
-            API={props.API}
-            onNewBlockedArea={(zone) => handleNewBlockedAreaStore(zone)}
-            blockedArea={{
-              screen: blockedArea.screen,
-              requests: blockedArea.requests,
-              goals: blockedArea.goals,
-            }}
+            hovering={props.hovering}
             bind={bindStore}
             onSize={(width, height) => handleSizeStore(width, height)}
           />
         </div>
-
-        <Settings
-          hovering={hovering}
-          onChangeSides={handleChangeSides}
-          onToggleChests={handleToggleChests}
-        />
-      </div>
-
-      <div>
-        <Chests onCurrencyUpdate={handleChestPlus} showChests={showChests} />
+        <div
+          className="chestContainer"
+          style={{
+            left: posChest.translateX + "vw",
+            top: posChest.translateY + "vh",
+          }}
+        >
+          <Chests pos={posChest} onChestCollission={chestCollission} />
+        </div>
       </div>
     </div>
   );
 };
 
-export default Extention;
+export default Extension;

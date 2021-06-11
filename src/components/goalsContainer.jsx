@@ -1,11 +1,17 @@
 import React, { useState, useEffect } from "react";
-import GoalsHeader from "./goalsHeader";
-import Goal from "./goal";
+import { useDispatch, useSelector } from "react-redux";
+import { getGoals } from "../store/entities";
+import GoalsHeader from "./goals/goalsHeader";
+import Goal from "./goals/goal";
 import ToggleButton from "./toggleButton";
 
 const GoalsContainer = (props) => {
-  const [goals, setGoals] = useState([]);
-  const [show, setShow] = useState(true);
+  const dispatch = useDispatch();
+  const goals = useSelector((state) => state.entities.goals);
+  const [show, setShow] = useState(
+    useSelector((state) => state.settings.showContainer.goals)
+  );
+  let { hovering } = props;
 
   function handleSize() {
     props.onSize({
@@ -17,63 +23,35 @@ const GoalsContainer = (props) => {
         window.innerHeight,
     });
   }
+
   useEffect(() => {
-    props.socket.emit("getgoals");
-    props.socket.on("getgoals", (data) => {
-      setGoals(data);
-      handleSize();
-    });
-    // eslint-disable-next-line
+    dispatch(getGoals());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   function handleToggle() {
     setShow(!show);
   }
+
   useEffect(() => {
     handleSize();
     // eslint-disable-next-line
-  }, [show]);
-  function handleGoalsUpdate(goalId, value) {
-    let data = {
-      idx: goalId - 1,
-      username: props.user,
-      value: value,
-    };
+  }, [show, hovering, goals]);
 
-    props.socket.emit("goalupdate", data);
-
-    props.onCurrencyUpdate(value);
-  }
-  const renderPage = () => {
-    if (show) {
-      return (
-        <div>
-          <ToggleButton status={show} onToggle={handleToggle} />
-          <div {...props.bind}>
-            <GoalsHeader />
+  return (
+    <div>
+      {show ||
+        (hovering && (
+          <div>
+            <ToggleButton status={show} onToggle={handleToggle} />
+            <div {...props.bind}>
+              <GoalsHeader />
+            </div>
           </div>
-          {goals.map((goal) => (
-            <Goal
-              key={goal.id}
-              goal={goal}
-              onCbucksAdd={(value) => handleGoalsUpdate(goal.id, value)}
-              currency={props.currency}
-            />
-          ))}
-        </div>
-      );
-    } else if (props.hovering) {
-      return (
-        <div>
-          <ToggleButton status={show} onToggle={handleToggle} />
-          <div {...props.bind}>
-            <GoalsHeader />
-          </div>
-        </div>
-      );
-    }
-    return null;
-  };
-  return <div>{renderPage()}</div>;
+        ))}
+      {show && goals.map((goal) => <Goal key={goal.id} goal={goal} />)}
+    </div>
+  );
 };
 
 export default GoalsContainer;

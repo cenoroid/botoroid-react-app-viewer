@@ -1,52 +1,52 @@
 import React, { useState, useEffect } from "react";
-import Extention from "./components/extention";
+import { useDispatch, useSelector } from "react-redux";
+import { loginRequest } from "./store/auth";
+import { getSettings } from "./store/settings";
+import Extension from "./components/extension";
+import GrantAccess from "./components/grantAccess";
 import "./App.css";
-import axios from "axios";
-import io from "socket.io-client";
-//const API = "http://localhost:4000";
-const API = "https://botoroid.xyz";
-const socket = io(API);
+
 const App = () => {
-  const [page, setPage] = useState(<div></div>);
+  const dispatch = useDispatch();
+  const userData = useSelector((state) => state.auth);
+  const settingsLoaded = useSelector((state) => state.settings.loaded);
+  const [hovering, setHovering] = useState(false);
+  const [show, setShow] = useState(false);
+  const toggleButton = (
+    <button className="grantAccessToggle" onClick={handleToggle}></button>
+  );
+
   useEffect(() => {
+    dispatch(getSettings());
     window.Twitch.ext.onAuthorized(async function (auth) {
       if (window.Twitch.ext.viewer.isLinked) {
-        await axios
-          .post(API + "/getuser", { userToken: auth.token })
-          .then((res) => {
-            socket.emit("join", res.data.username);
-            setPage(
-              <div>
-                <Extention
-                  user={res.data.username}
-                  currency={res.data.currency}
-                  socket={socket}
-                  API={API}
-                />
-              </div>
-            );
-          });
-      } else {
-        setPage(
-          <div className="grantAccess">
-            <div style={{ color: "white", marginTop: "1vh" }}>
-              In order to use this extension,{<br></br>} you first need to grant
-              it access{<br></br>} so it knows who you are
-            </div>
-            <button
-              style={{
-                height: "4vh",
-                width: "5vw",
-              }}
-              onClick={() => window.Twitch.ext.actions.requestIdShare()}
-            >
-              OPEN DIALOGUE
-            </button>
-          </div>
-        );
+        dispatch(loginRequest(auth));
       }
     });
+    // eslint-disable-next-line
   }, []);
-  return page;
+
+  function handleToggle() {
+    setShow(!show);
+  }
+
+  window.Twitch.ext.onContext((object) => {
+    if (object.arePlayerControlsVisible && !hovering) {
+      setHovering(true);
+    } else if (!object.arePlayerControlsVisible && hovering) {
+      setHovering(false);
+    }
+  });
+
+  return userData.linked && settingsLoaded ? (
+    <div>
+      <Extension hovering={hovering} />
+    </div>
+  ) : (
+    <div>
+      {hovering && <div>{toggleButton}</div>}
+      {show && <GrantAccess />}
+    </div>
+  );
 };
 export default App;

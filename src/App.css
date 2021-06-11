@@ -8,7 +8,15 @@
 }
 
 ::-webkit-scrollbar {
-  display: none;
+  -webkit-appearance: none;
+  width: 9px;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
 }
 .mainContainer {
   margin-top: 6vh;
@@ -24,35 +32,48 @@
   position: absolute;
 }
 .toggleButton {
-  right: 0;
-  height: 2vh;
+  color: white;
+  right: 0.3vw;
+  height: 1vw;
   background-color: transparent;
   border-radius: 4px;
-  width: 2vw;
-  border: none;
+  width: 1.3vw;
+  border: 1px grey solid;
   outline: none;
   position: absolute;
   font-size: 1vw;
+  padding-bottom: 0.6vw;
+  padding-inline: 0.2vw;
 }
-.header {
-  width: 90%;
-  border-radius: 14px;
+.toggleButton:hover {
+  background-color: grey;
+}
+.requestListHeader {
+  width: 85%;
+  height: 3.5vh;
+  border-radius: 8px;
   background-color: rgb(0, 0, 0, 0.3);
   font-family: "Quicksand", sans-serif;
-  font-size: 1.3vw;
+  font-size: 2.5vh;
   color: blanchedalmond;
   text-align: end;
-  padding-right: 2vw;
+  padding-right: 15%;
+  cursor: grab;
 }
-
-.footer {
+.requestListHeader:active,
+.goalsHeader:active,
+.storeHeader:active {
+  cursor: grabbing;
+}
+.requestListFooter {
   margin-top: 1px;
-  border-radius: 14px;
+  border-radius: 8px;
   background-color: rgb(0, 0, 0, 0.3);
   font-family: "Quicksand", sans-serif;
-  font-size: 0.9vw;
+  font-size: 2vh;
   color: blanchedalmond;
   text-align: center;
+  cursor: pointer;
 }
 .goal {
   margin-top: 0.2vh;
@@ -90,21 +111,27 @@
   position: absolute;
 }
 .goalAddButton {
-  font-size: 1vw;
+  font-size: 0.7vw;
   box-sizing: border-box;
   height: 2.7vh;
-  right: 0;
+  right: -1px;
   outline: none;
   width: 1vw;
   margin-top: -2.7vh;
+  background: black;
+  color: white;
   position: absolute;
 }
 .goalAddInput {
+  background: black;
+  color: white;
   box-sizing: border-box;
-  width: 2vw;
+  width: 3vw;
   height: 2.7vh;
   right: 1vw;
   margin-top: -2.7vh;
+  border: 1px lightblue solid;
+  font-size: 0.8vw;
   position: absolute;
 }
 .goalsHeader {
@@ -113,8 +140,17 @@
   text-align: center;
   font-size: 1.3vw;
   width: 100%;
-  border-radius: 14px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
   background: rgb(0, 0, 0, 0.3);
+  cursor: grab;
+  border: 1px solid grey;
+  margin-bottom: -2px;
+}
+.requestsContainer {
+  max-height: 31vh;
+  overflow-y: auto;
+  margin-right: 1.5%;
 }
 .request {
   box-sizing: border-box;
@@ -122,55 +158,66 @@
   text-align: left;
   font-family: "Titillium Web";
   padding-left: 0.5vw;
-  font-size: 1.8vh;
-  background-color: rgb(0, 0, 0, 0.7);
-  border-radius: 14px;
-
-  margin-top: 0.1vh;
-  margin-left: auto;
-  margin-right: auto;
-  width: 90%;
-  white-space: nowrap;
-  max-width: 90%;
-  overflow: hidden;
+  font-size: 1vw;
+  background-color: rgb(0, 0, 0, 0.3);
+  border-radius: 8px;
+  margin-top: 1px;
+  margin-left: 4%;
+  margin-right: 1%;
+  width: 95%;
+  max-width: 95%;
   display: flex;
   padding-right: 0.5vw;
+  vertical-align: top;
+  max-height: 3vh;
 }
 
 #id1.request {
   font-size: 1.3vw;
-
   width: 100%;
   max-width: 100%;
+  margin-left: 0;
+  max-height: 3.53vh;
 }
 .icon {
   height: 1.5vh;
-  margin-top: 0.7vh;
 }
 #id1.icon {
   height: 1.9vh;
 }
 .requestMessage {
-  display: inline-block;
-  overflow: hidden;
-  white-space: nowrap;
-  vertical-align: top;
   min-width: 0%;
+  word-break: break-all;
+  overflow: hidden;
+  vertical-align: top;
 }
-.requestMessage:hover {
-  white-space: normal;
+
+.request:hover {
+  max-height: initial;
+  flex-wrap: wrap;
+}
+#id1.request:hover {
+  max-height: initial;
+}
+.request:hover .requestMessage {
+  overflow: visible;
+  min-width: initial;
+  word-break: break-word;
 }
 .requestName {
-  display: inline-block;
   flex: 1;
+  white-space: nowrap;
+  display: inline-block;
 }
+
 .requestListTimer {
-  color: white;
-  font-size: 1.4vw;
+  color: blanchedalmond;
+  font-size: 2.5vh;
   font-family: "Titillium Web";
   position: absolute;
   margin-left: 0.8vw;
-  margin-top: -3.4vh;
+  margin-top: -3.7vh;
+  pointer-events: none;
 }
 .redemption {
   border: transparent;
@@ -181,12 +228,14 @@
 }
 .redemption:hover {
   font-size: 1.3vw;
+  color: cyan;
 }
 .storeFooter {
   font-family: "Quicksand", sans-serif;
   text-align: center;
-  border: 1px solid black;
-  border-radius: 14px;
+  border: 1px solid grey;
+  border-bottom-right-radius: 8px;
+  border-bottom-left-radius: 8px;
   font-size: 1vw;
   color: blanchedalmond;
   background-color: rgb(0, 0, 0, 0.3);
@@ -197,11 +246,16 @@
   text-align: center;
   font-size: 1.5vw;
   background-color: rgb(0, 0, 0, 0.3);
-  border-radius: 14px;
+  border: 1px solid grey;
+  border-top-right-radius: 8px;
+  border-top-left-radius: 8px;
+  cursor: grab;
 }
-#store.container {
+.redemptionsContainer {
   background-color: rgb(0, 0, 0, 0.3);
-  border-radius: 14px;
+}
+
+#store.container {
   padding-left: 0px;
   padding-right: 0px;
   text-align: center;
@@ -219,49 +273,99 @@
   position: absolute;
   height: 2vh;
   width: 2vw;
-  border-radius: 14px;
+  border-radius: 8px;
   text-align: center;
+  background: black;
+  color: blanchedalmond;
 }
 .backButtonText {
   font-size: 2vw;
   margin-top: -1.2vh;
 }
-.redemptionLabel {
+.newRedemption {
+  background-color: rgb(0, 0, 0, 0.3);
+  border-top-right-radius: 8px;
+  border-top-left-radius: 8px;
+  font-size: 1.5vw;
+  color: blanchedalmond;
   font-family: "Quicksand", sans-serif;
+}
+.newRedemptionHeader {
+  border-top-right-radius: 8px;
+  border-top-left-radius: 8px;
+  border: solid 1px grey;
+}
+.redemptionLabel {
   text-align: center;
   font-size: 1.3vw;
 }
 .redemptionInput {
   width: 70%;
   height: 2vh;
+  margin-top: 1vh;
+  background: black;
 }
 .redemptionButton {
   font-size: 1vw;
   margin-top: 1vh;
   margin-bottom: 1vh;
-  border-radius: 14px;
+  border-radius: 8px;
   height: 3vh;
   width: 40%;
+  background: black;
+  color: blanchedalmond;
 }
 .redemptionInfo {
-  width: 100%;
+  margin-top: 1vh;
   font-size: 1vw;
+  margin-left: 10%;
+  max-width: 80%;
 }
-.chest {
+.chestButton {
   outline: none;
-
   border: none;
   position: absolute;
   background-color: transparent;
 }
-.grantAccess {
+.chestContainer {
+  position: absolute;
+}
+.chest {
+  object-fit: cover;
+  height: 3.5vh;
+  width: 2vw;
+  position: absolute;
+}
+.grantAccessContainer {
   margin-top: 40vh;
   font-size: 1.5vw;
   margin-left: 70vw;
   width: 20vw;
   text-align: center;
-  border: solid 1px green;
+  border: solid 1px lightblue;
   background-color: black;
   height: 17.5vh;
   border-radius: 12px;
+  color: white;
+  padding-top: 1vh;
+}
+.grantAccessButton {
+  font-size: 1vw;
+  height: 6vh;
+  width: 7vw;
+  background-color: lightblue;
+  border: none;
+  border-radius: 12px;
+}
+.grantAccessToggle {
+  width: 4vw;
+  height: 4vw;
+  position: absolute;
+  bottom: 15vh;
+  right: 6vw;
+  background-image: url("/src/components/media/botoroidLogo100.png");
+  background-size: cover;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: black;
 }

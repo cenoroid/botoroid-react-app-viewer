@@ -1,112 +1,101 @@
 import io from "socket.io-client";
-import axios from "axios";
 import { requestsUpdated, redemptionsUpdated, goalsUpdated } from "./entities";
-import { loginSuccess, updatedCurrency } from "./auth";
-import { settingsUpdated } from "./settings";
-import { initTimer, setTimerRunning } from "./timer";
-const API = "https://second.botoroid.xyz";
-const socket = io(API);
-const version = "v0.0.2";
+import { currencyUpdated } from "./auth";
+import { settingsUpdated } from "./appConfig";
+import { initTimer, setTimerRunning, setTimer } from "./appConfig";
+import { loginRequest } from "./actions";
+
+const api = process.env.REACT_APP_API;
+const socket = io(api);
 const listener = {};
-const websocket = (store) => (next) => async (action) => {
-  console.log(listener);
-  if (action.type === "auth/loginRequest") {
-    try {
-      const response = await axios.post(API + "/getuser", {
-        userToken: action.payload.token,
-      });
-      store.dispatch(loginSuccess(response.data));
-      socket.emit("join", { name: response.data.username, version });
+
+const websocket =
+  ({ dispatch, getState }) =>
+  (next) =>
+  async (action) => {
+    if (action.type === "initApp") {
+      socket.emit("getsettings");
+      if (!listener.getsettings) {
+        listener.getsettings = true;
+        socket.on("getsettings", (data) => {
+          dispatch(settingsUpdated(data));
+        });
+      }
+      dispatch(loginRequest({ socket, url: api }));
       if (!listener.updatecurrency) {
         listener.updatecurrency = true;
         socket.on("updatecurrency", (data) => {
-          store.dispatch(updatedCurrency(data));
+          dispatch(currencyUpdated(data));
         });
       }
-    } catch (error) {}
-  }
-  if (action.type === "entities/getRequests") {
-    socket.emit("getrequests");
-    if (!listener.getrequests) {
-      listener.getrequests = true;
-      socket.on("getrequests", (data) => {
-        store.dispatch(requestsUpdated(data));
-      });
     }
-  }
-  if (action.type === "entities/getGoals") {
-    socket.emit("getgoals");
-    if (!listener.getgoals) {
-      listener.getgoals = true;
-      socket.on("getgoals", (data) => {
-        store.dispatch(goalsUpdated(data));
-      });
+    if (action.type === "entities/getRequests") {
+      socket.emit("getrequests");
+      if (!listener.getrequests) {
+        listener.getrequests = true;
+        socket.on("getrequests", (data) => {
+          dispatch(requestsUpdated(data));
+        });
+      }
     }
-  }
-  if (action.type === "entities/getRedemptions") {
-    socket.emit("getredemptions");
-    if (!listener.getredemptions) {
-      listener.getredemptions = true;
-      socket.on("getredemptions", (data) => {
-        store.dispatch(redemptionsUpdated(data));
-      });
+    if (action.type === "entities/getGoals") {
+      socket.emit("getgoals");
+      if (!listener.getgoals) {
+        listener.getgoals = true;
+        socket.on("getgoals", (data) => {
+          dispatch(goalsUpdated(data));
+        });
+      }
     }
-  }
-  if (action.type === "entities/addRequest") {
-    console.log(action);
-    let { username, currency } = store.getState().auth;
-    if (action.payload.cost <= currency) {
-      let data = {
-        username,
-        id: action.payload.id,
-        message: action.payload.message,
-      };
-      console.log(data);
-      socket.emit("redemption", data);
+    if (action.type === "entities/getRedemptions") {
+      socket.emit("getredemptions");
+      if (!listener.getredemptions) {
+        listener.getredemptions = true;
+        socket.on("getredemptions", (data) => {
+          dispatch(redemptionsUpdated(data));
+        });
+      }
     }
-  }
-  if (action.type === "entities/addToGoal") {
-    let { username, currency } = store.getState().auth;
-    if (action.payload.value <= currency) {
-      let data = { ...action.payload, username };
-      socket.emit("goalupdate", data);
+    if (action.type === "entities/addRequest") {
+      const { cost, id, message } = action.payload;
+      const { username, currency } = getState().auth;
+      if (cost <= currency) {
+        const data = { username, id, message };
+        socket.emit("redemption", data);
+      }
     }
-  }
-  if (action.type === "settings/getSettings") {
-    console.log(action.type);
-    socket.emit("getsettings");
-    if (!listener.getsettings) {
-      listener.getsettings = true;
-      socket.on("getsettings", (data) => {
-        console.log(data);
-        store.dispatch(settingsUpdated(data));
-      });
+    if (action.type === "entities/addToGoal") {
+      const { username, currency } = getState().auth;
+      if (action.payload.value <= currency) {
+        const data = { ...action.payload, username };
+        socket.emit("goalupdate", data);
+      }
     }
-  }
 
-  if (action.type === "timer/getTimer") {
-    socket.emit("gettimer");
-    if (!listener.gettimer) {
-      listener.gettimer = true;
-      socket.on("starttimer", (resTimer, resTimerRunning) => {
-        if (resTimer > 0) {
-          store.dispatch(initTimer(resTimer));
-          store.dispatch(setTimerRunning(resTimerRunning));
-        }
-      });
-      socket.on("pausetimer", () => {
-        store.dispatch(setTimerRunning("toggle"));
-      });
-      socket.on("stoptimer", () => {
-        store.dispatch(initTimer(0));
-      });
+    if (action.type === "appConfig/getTimer") {
+      if (!getState().appConfig.timer.initialized) {
+        socket.emit("gettimer");
+      } else dispatch(setTimer({ resumed: Date.now() }));
+      if (!listener.gettimer) {
+        listener.gettimer = true;
+        socket.on("starttimer", (timer, timerRunning) => {
+          if (timer > 0) {
+            dispatch(initTimer({ timer, timerRunning }));
+          }
+        });
+        socket.on("pausetimer", () => {
+          dispatch(setTimerRunning("toggle"));
+        });
+        socket.on("stoptimer", () => {
+          dispatch(initTimer({ timer: 0, timerRunning: false }));
+        });
+      }
     }
-  }
-  if (action.type === "auth/chestClicked") {
-    let { username } = store.getState().auth;
-    let { reward } = store.getState().settings.chests;
-    socket.emit("updatecurrency", { username, value: reward });
-  }
-  return next(action);
-};
+    if (action.type === "chestClicked") {
+      const { username } = getState().auth;
+      const { reward } = getState().appConfig.settings.chests;
+      socket.emit("updatecurrency", { username, value: reward });
+    }
+    return next(action);
+  };
 export default websocket;

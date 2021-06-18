@@ -5,6 +5,7 @@
   margin: 0;
   padding: 0;
   box-sizing: content-box;
+  user-select: none;
 }
 
 ::-webkit-scrollbar {
@@ -19,9 +20,9 @@
   box-shadow: 0 0 1px rgba(255, 255, 255, 0.5);
 }
 .mainContainer {
-  margin-top: 6vh;
-  width: 98vw;
-  height: 88vh;
+  margin-top: 1vh;
+  width: 99vw;
+  height: 98vh;
   position: relative;
   margin-right: 0.5vw;
   margin-left: 0.5vw;
@@ -34,106 +35,36 @@
 .toggleButton {
   color: white;
   right: 0.3vw;
-  height: 1vw;
   background-color: transparent;
   border-radius: 4px;
-  width: 1.3vw;
+  width: 1.6vw;
   border: 1px grey solid;
   outline: none;
-  position: absolute;
+  float: right;
   font-size: 1vw;
-  padding-bottom: 0.6vw;
-  padding-inline: 0.2vw;
+  padding-bottom: 0.3vw;
+  margin-right: 3px;
 }
 .toggleButton:hover {
   background-color: grey;
 }
 .requestListHeader {
-  width: 85%;
+  border: 1px grey solid;
   height: 3.5vh;
   border-radius: 8px;
   background-color: rgb(0, 0, 0, 0.3);
   font-family: "Quicksand", sans-serif;
   font-size: 2.5vh;
   color: blanchedalmond;
-  text-align: end;
-  padding-right: 15%;
   cursor: grab;
 }
-.requestListHeader:active,
-.goalsHeader:active,
-.storeHeader:active {
-  cursor: grabbing;
+
+.requestListHeaderTitle {
+  float: right;
+  margin-right: 0.4vw;
+  pointer-events: none;
 }
-.requestListFooter {
-  margin-top: 1px;
-  border-radius: 8px;
-  background-color: rgb(0, 0, 0, 0.3);
-  font-family: "Quicksand", sans-serif;
-  font-size: 2vh;
-  color: blanchedalmond;
-  text-align: center;
-  cursor: pointer;
-}
-.goal {
-  margin-top: 0.2vh;
-}
-.goalBorder {
-  background-color: black;
-  height: 2.7vh;
-  border-radius: 3px;
-  width: 97.63%;
-}
-.goalFill {
-  background-color: rgb(0, 153, 0);
-  height: 2.7vh;
-  border-radius: 3px;
-  max-width: 97.8%;
-  margin-top: -2.7vh;
-  position: absolute;
-}
-.goalTitle {
-  text-align: start;
-  color: blanchedalmond;
-  font-family: "Quicksand", sans-serif;
-  font-size: 1vw;
-  padding-left: 0.5vw;
-  margin-top: -2.5vh;
-  position: absolute;
-}
-.goalNumbers {
-  text-align: end;
-  color: blanchedalmond;
-  font-family: "Quicksand", sans-serif;
-  font-size: 1vw;
-  margin-top: -2.5vh;
-  right: 1.5vw;
-  position: absolute;
-}
-.goalAddButton {
-  font-size: 0.7vw;
-  box-sizing: border-box;
-  height: 2.7vh;
-  right: -1px;
-  outline: none;
-  width: 1vw;
-  margin-top: -2.7vh;
-  background: black;
-  color: white;
-  position: absolute;
-}
-.goalAddInput {
-  background: black;
-  color: white;
-  box-sizing: border-box;
-  width: 3vw;
-  height: 2.7vh;
-  right: 1vw;
-  margin-top: -2.7vh;
-  border: 1px lightblue solid;
-  font-size: 0.8vw;
-  position: absolute;
-}
+
 .goalsHeader {
   font-family: "Quicksand", sans-serif;
   color: blanchedalmond;
@@ -147,8 +78,32 @@
   border: 1px solid grey;
   margin-bottom: -2px;
 }
+
+.storeHeader {
+  color: blanchedalmond;
+  font-family: "Quicksand", sans-serif;
+  text-align: center;
+  font-size: 1.5vw;
+  background-color: rgb(0, 0, 0, 0.3);
+  border: 1px solid grey;
+  border-top-right-radius: 8px;
+  border-top-left-radius: 8px;
+  cursor: grab;
+}
+
+.requestListHeader:active,
+.goalsHeader:active,
+.storeHeader:active {
+  cursor: grabbing;
+}
+
+#requestList.container {
+  padding-right: 0px;
+  padding-left: 0px;
+}
+
 .requestsContainer {
-  max-height: 31vh;
+  max-height: 26vh;
   overflow-y: auto;
   margin-right: 1.5%;
 }
@@ -214,11 +169,97 @@
   color: blanchedalmond;
   font-size: 2.5vh;
   font-family: "Titillium Web";
-  position: absolute;
-  margin-left: 0.8vw;
-  margin-top: -3.7vh;
   pointer-events: none;
+  display: inline-block;
+  margin-left: 0.4vw;
 }
+
+.requestListFooter {
+  margin-top: 1px;
+  border-radius: 8px;
+  background-color: rgb(0, 0, 0, 0.3);
+  font-family: "Quicksand", sans-serif;
+  font-size: 2vh;
+  color: blanchedalmond;
+  text-align: center;
+  cursor: pointer;
+}
+
+#goals.container {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.goal {
+  margin-top: 0.2vh;
+}
+.goalBorder {
+  background-color: black;
+  height: 2.7vh;
+  border-radius: 3px;
+  width: 97.63%;
+}
+.goalFill {
+  background-color: rgb(0, 153, 0);
+  height: 2.7vh;
+  border-radius: 3px;
+  max-width: 97.8%;
+  margin-top: -2.7vh;
+  position: absolute;
+}
+.goalTitle {
+  text-align: start;
+  color: blanchedalmond;
+  font-family: "Quicksand", sans-serif;
+  font-size: 1vw;
+  padding-left: 0.5vw;
+  margin-top: -2.5vh;
+  position: absolute;
+}
+.goalNumbers {
+  text-align: end;
+  color: blanchedalmond;
+  font-family: "Quicksand", sans-serif;
+  font-size: 1vw;
+  margin-top: -2.5vh;
+  right: 1.5vw;
+  position: absolute;
+}
+.goalAddButton {
+  font-size: 0.7vw;
+  box-sizing: border-box;
+  height: 2.7vh;
+  right: -1px;
+  outline: none;
+  width: 1vw;
+  margin-top: -2.7vh;
+  background: black;
+  color: white;
+  position: absolute;
+}
+.goalAddInput {
+  background: black;
+  color: white;
+  box-sizing: border-box;
+  width: 3vw;
+  height: 2.7vh;
+  right: 1vw;
+  margin-top: -2.7vh;
+  border: 1px lightblue solid;
+  font-size: 0.8vw;
+  position: absolute;
+}
+
+#store.container {
+  padding-left: 0px;
+  padding-right: 0px;
+  text-align: center;
+}
+
+.storeBody {
+  background-color: rgb(0, 0, 0, 0.3);
+}
+
 .redemption {
   border: transparent;
   font-size: 1.1vw;
@@ -230,44 +271,7 @@
   font-size: 1.3vw;
   color: cyan;
 }
-.storeFooter {
-  font-family: "Quicksand", sans-serif;
-  text-align: center;
-  border: 1px solid grey;
-  border-bottom-right-radius: 8px;
-  border-bottom-left-radius: 8px;
-  font-size: 1vw;
-  color: blanchedalmond;
-  background-color: rgb(0, 0, 0, 0.3);
-}
-.storeHeader {
-  color: blanchedalmond;
-  font-family: "Quicksand", sans-serif;
-  text-align: center;
-  font-size: 1.5vw;
-  background-color: rgb(0, 0, 0, 0.3);
-  border: 1px solid grey;
-  border-top-right-radius: 8px;
-  border-top-left-radius: 8px;
-  cursor: grab;
-}
-.redemptionsContainer {
-  background-color: rgb(0, 0, 0, 0.3);
-}
 
-#store.container {
-  padding-left: 0px;
-  padding-right: 0px;
-  text-align: center;
-}
-#requestList.container {
-  padding-right: 0px;
-  padding-left: 0px;
-}
-#goals.container {
-  padding-left: 0px;
-  padding-right: 0px;
-}
 .backButton {
   right: 0px;
   position: absolute;
@@ -321,21 +325,32 @@
   margin-left: 10%;
   max-width: 80%;
 }
+
+.storeFooter {
+  font-family: "Quicksand", sans-serif;
+  text-align: center;
+  border: 1px solid grey;
+  border-bottom-right-radius: 8px;
+  border-bottom-left-radius: 8px;
+  font-size: 1vw;
+  color: blanchedalmond;
+  background-color: rgb(0, 0, 0, 0.3);
+}
+
 .chestButton {
   outline: none;
   border: none;
-  position: absolute;
   background-color: transparent;
+  height: inherit;
 }
 .chestContainer {
   position: absolute;
 }
 .chest {
   object-fit: cover;
-  height: 3.5vh;
-  width: 2vw;
-  position: absolute;
+  height: inherit;
 }
+
 .grantAccessContainer {
   margin-top: 40vh;
   font-size: 1.5vw;

@@ -1,6 +1,6 @@
 {
   "name": "botoroidviewerui",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "homepage": "./",
   "private": true,
   "dependencies": {
@@ -15,6 +15,7 @@
     "react-redux": "^7.2.4",
     "react-scripts": "4.0.3",
     "react-spring": "^9.2.1",
+    "react-use-state-with-callback": "^1.0.2",
     "redux": "^4.1.0",
     "socket.io-client": "^4.1.2",
     "web-vitals": "^1.1.1"
@@ -24,7 +25,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "zip": "react-scripts build && npm-build-zip"
+    "zip": "react-scripts build && npm-build-zip",
+    "serve": "serve -s -l 3000"
   },
   "eslintConfig": {
     "extends": [

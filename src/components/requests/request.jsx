@@ -3,13 +3,14 @@ import youtubeIconImport from "../media/youtubeicon.png";
 import greyYoutubeIconImport from "../media/greyyoutubeicon.png";
 import gameIconImport from "../media/xboxicon.png";
 
-const Request = (props) => {
+const Request = ({ request, onHover }) => {
   function defineIcon() {
-    if (props.request.subtype === "game request") {
+    const { subtype } = request;
+    if (subtype === "game request") {
       return gameIconImport;
-    } else if (props.request.subtype === "video request") {
+    } else if (subtype === "video request") {
       return youtubeIconImport;
-    } else if (props.request.subtype === "short video request") {
+    } else if (subtype === "short video request") {
       return greyYoutubeIconImport;
     }
   }
@@ -17,21 +18,21 @@ const Request = (props) => {
   return (
     <div
       className="request"
-      id={"id" + props.request.id}
-      onMouseOver={props.onHover}
-      onMouseOut={props.onHover}
+      id={"id" + request.id}
+      onMouseOver={onHover}
+      onMouseOut={onHover}
     >
       <div className="requestMessage">
-        {props.request.id}.{" "}
+        {request.id}.{" "}
         <img
           className="icon"
-          id={"id" + props.request.id}
+          id={"id" + request.id}
           src={defineIcon()}
           alt="its an icon"
         ></img>{" "}
-        {props.request.message}
+        {request.message}
       </div>
-      <div className="requestName">{"- " + props.request.name}</div>
+      <div className="requestName">{"- " + request.name}</div>
     </div>
   );
 };

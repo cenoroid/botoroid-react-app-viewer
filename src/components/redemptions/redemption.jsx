@@ -1,13 +1,10 @@
 import React from "react";
 
-const Redemption = (props) => {
+const Redemption = ({ redemption, onRedeem }) => {
   return (
     <div>
-      <button
-        className="redemption"
-        onClick={() => props.onRedeem(props.redemption)}
-      >
-        {props.redemption.type}
+      <button className="redemption" onClick={() => onRedeem(redemption)}>
+        {redemption.type}
       </button>
     </div>
   );

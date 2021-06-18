@@ -1,89 +1,50 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getRequests } from "../store/entities";
-import Request from "./requests/request";
+import { getRequests } from "../store/actions";
 import RequestListHeader from "./requests/requestListHeader";
+import RequestListBody from "./requests/requestListBody";
 import RequestListFooter from "./requests/requestListFooter";
-import RequestListTimer from "./requests/requestListTimer";
-import ToggleButton from "./toggleButton";
 
-const RequestContainer = (props) => {
+const RequestContainer = ({ bind, onSize }) => {
   const dispatch = useDispatch();
   const [show, setShow] = useState(
-    useSelector((state) => state.settings.showContainer.requestList)
+    useSelector((state) => state.appConfig.settings.showContainer.requestList)
   );
+  const hovering = useSelector((state) => state.appConfig.player.hovering);
   const [expand, setExpand] = useState(true);
   const requests = useSelector((state) => state.entities.requests);
-  let { hovering } = props;
 
   useEffect(() => {
     dispatch(getRequests());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
-    handleSize();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [show, expand, hovering, requests]);
+    onSize("requestList");
+  }, [show, expand, hovering, requests, onSize]);
 
-  function handleSize() {
-    props.onSize({
-      width:
-        (100 * document.getElementById("requestList").offsetWidth) /
-        window.innerWidth,
-      height:
-        (100 * document.getElementById("requestList").offsetHeight) /
-        window.innerHeight,
-    });
-  }
+  return show || hovering ? (
+    <Fragment>
+      <RequestListHeader
+        show={show}
+        onToggle={() => setShow(!show)}
+        bind={bind}
+      />
 
-  function handleToggle() {
-    setShow(!show);
-  }
-
-  function handleExpand() {
-    setExpand(!expand);
-  }
-
-  return show ? (
-    <div>
-      <ToggleButton status={show} onToggle={handleToggle} />
-      <div {...props.bind}>
-        <RequestListHeader />
-      </div>
-      <RequestListTimer socket={props.socket} />
-      {requests.length !== 0 && (
-        <div>
-          <Request
-            onHover={handleSize}
-            key={requests[0].id}
-            request={requests[0]}
+      {show && (
+        <Fragment>
+          <RequestListBody
+            requests={requests}
+            onHover={() => onSize("requestList")}
+            expand={expand}
           />
-          {expand && (
-            <div className="requestsContainer">
-              {requests.slice(1).map((request) => (
-                <Request
-                  onHover={handleSize}
-                  key={request.id}
-                  request={request}
-                />
-              ))}
-            </div>
-          )}
-        </div>
+          <RequestListFooter
+            onExpand={() => setExpand(!expand)}
+            expand={expand}
+          />
+        </Fragment>
       )}
-      <RequestListFooter onExpand={handleExpand} expand={expand} />
-    </div>
-  ) : (
-    props.hovering && (
-      <div>
-        <ToggleButton status={show} onToggle={handleToggle} />
-        <div {...props.bind}>
-          <RequestListHeader />
-        </div>
-      </div>
-    )
-  );
+    </Fragment>
+  ) : null;
 };
 
 export default RequestContainer;

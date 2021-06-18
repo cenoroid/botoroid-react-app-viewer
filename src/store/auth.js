@@ -5,22 +5,21 @@ const slice = createSlice({
   initialState: {
     username: "",
     currency: 0,
-    linked: false,
+    linked: process.env.NODE_ENV === "development" ? true : false,
   },
   reducers: {
     loginSuccess: (state, action) => {
-      state.username = action.payload.username;
-      state.currency = action.payload.currency;
+      const { username, currency } = action.payload;
+      state.username = username;
+      state.currency = currency;
       state.linked = true;
     },
-    updatedCurrency: (state, action) => {
+    currencyUpdated: (state, action) => {
       state.currency = state.currency + action.payload;
     },
-    chestClicked: () => {},
-    loginRequest: () => {},
   },
 });
 
-export const { loginRequest, loginSuccess, updatedCurrency, chestClicked } =
+export const { loginRequest, loginSuccess, currencyUpdated, chestClicked } =
   slice.actions;
 export default slice.reducer;

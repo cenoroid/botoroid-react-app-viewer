@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { loginRequest } from "./store/auth";
-import { getSettings } from "./store/settings";
+import { initApp } from "./store/actions";
+import { hoverUpdated, displayUpdated } from "./store/appConfig";
 import Extension from "./components/extension";
 import GrantAccess from "./components/grantAccess";
 import "./App.css";
@@ -9,44 +9,34 @@ import "./App.css";
 const App = () => {
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.auth);
-  const settingsLoaded = useSelector((state) => state.settings.loaded);
-  const [hovering, setHovering] = useState(false);
-  const [show, setShow] = useState(false);
-  const toggleButton = (
-    <button className="grantAccessToggle" onClick={handleToggle}></button>
+  const settingsLoaded = useSelector(
+    (state) => state.appConfig.settings.loaded
   );
-
   useEffect(() => {
-    dispatch(getSettings());
-    window.Twitch.ext.onAuthorized(async function (auth) {
-      if (window.Twitch.ext.viewer.isLinked) {
-        dispatch(loginRequest(auth));
-      }
-    });
-    // eslint-disable-next-line
-  }, []);
+    dispatch(initApp());
+  }, [dispatch]);
 
-  function handleToggle() {
-    setShow(!show);
-  }
-
-  window.Twitch.ext.onContext((object) => {
-    if (object.arePlayerControlsVisible && !hovering) {
-      setHovering(true);
-    } else if (!object.arePlayerControlsVisible && hovering) {
-      setHovering(false);
-    }
+  window.Twitch.ext.onContext(({ displayResolution }, e) => {
+    if (e.includes("displayResolution"))
+      dispatch(displayUpdated({ displayResolution }));
   });
 
   return userData.linked && settingsLoaded ? (
-    <div>
-      <Extension hovering={hovering} />
+    <div
+      onMouseOver={(e) => {
+        e.stopPropagation();
+        if (e.target.className === "mainContainer")
+          dispatch(hoverUpdated({ visible: true }));
+      }}
+      onMouseLeave={(e) => {
+        e.stopPropagation();
+        dispatch(hoverUpdated({ visible: false }));
+      }}
+    >
+      <Extension />
     </div>
   ) : (
-    <div>
-      {hovering && <div>{toggleButton}</div>}
-      {show && <GrantAccess />}
-    </div>
+    <GrantAccess />
   );
 };
 export default App;

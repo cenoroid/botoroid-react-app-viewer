@@ -33,7 +33,7 @@
     "authorName": "Cenoroid",
     "bitsEnabled": false,
     "canInstall": true,
-    "configUrl": "https://qy20qat73227523q6ihcrjhuup9ywc.ext-twitch.tv/qy20qat73227523q6ihcrjhuup9ywc/0.0.2/f96ad8bdc5600a09aa3139e89ee0f56f/config.html",
+    "configUrl": "http://localhost:3000/config.html",
     "configurationLocation": "none",
     "description": "This extension manages loyalty points and provides ways to spend them like community goals, game or video requests... The currency is called cbucks and you can get them by converting channel points, winning raffles, subscribing cheering or donating.\n",
     "eulaTosUrl": "",
@@ -56,24 +56,24 @@
       "https://extensions-discovery-images.twitch.tv/qy20qat73227523q6ihcrjhuup9ywc/0.0.1/screenshot5ceec01b-f335-47bb-ba47-77cf39dd668a"
     ],
     "sku": "",
-    "state": "Assets Uploaded",
+    "state": "Testing",
     "subscriptionsSupportLevel": "none",
     "summary": "Community Extension to manage currency, goals and events.",
     "supportEmail": "almostwar@gmail.com",
     "vendorCode": "",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "viewerSummary": "Get cbucks by converting channel points, winning raffles, subscribing cheering or donating. Spend your cbucks on goals or redemptions!",
     "viewerUrl": "",
     "viewerUrls": {
-      "videoOverlay": "https://qy20qat73227523q6ihcrjhuup9ywc.ext-twitch.tv/qy20qat73227523q6ihcrjhuup9ywc/0.0.2/f96ad8bdc5600a09aa3139e89ee0f56f/index.html"
+      "videoOverlay": "http://localhost:3000/index.html"
     },
     "views": {
       "videoOverlay": {
-        "viewerUrl": "https://qy20qat73227523q6ihcrjhuup9ywc.ext-twitch.tv/qy20qat73227523q6ihcrjhuup9ywc/0.0.2/f96ad8bdc5600a09aa3139e89ee0f56f/index.html",
+        "viewerUrl": "http://localhost:3000/index.html",
         "canLinkExternalContent": false
       },
       "config": {
-        "viewerUrl": "https://qy20qat73227523q6ihcrjhuup9ywc.ext-twitch.tv/qy20qat73227523q6ihcrjhuup9ywc/0.0.2/f96ad8bdc5600a09aa3139e89ee0f56f/config.html",
+        "viewerUrl": "http://localhost:3000/config.html",
         "canLinkExternalContent": false
       }
     },

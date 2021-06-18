@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { addToGoal } from "../../store/entities";
+import { addToGoal } from "../../store/actions";
 import { useNumberInput } from "../hooks/useNumberInput";
 
-const Goal = (props) => {
+const Goal = ({ goal }) => {
   const dispatch = useDispatch();
   const { value, bind, reset } = useNumberInput("");
   const [{ button, width }, setButton] = useState({
@@ -13,9 +13,9 @@ const Goal = (props) => {
 
   function handleCbucksAdd() {
     if (value > 0) {
-      if (props.goal.current + Number(value) <= props.goal.end) {
+      if (goal.current + Number(value) <= goal.end) {
         let data = {
-          id: props.goal.id - 1,
+          id: goal.id - 1,
           value,
         };
         dispatch(addToGoal(data));
@@ -32,12 +32,12 @@ const Goal = (props) => {
       <div
         className="goalFill"
         style={{
-          width: (props.goal.current / props.goal.end) * 97.5 + "%",
+          width: (goal.current / goal.end) * 97.5 + "%",
         }}
       ></div>
-      <div className="goalTitle">{props.goal.goal}</div>
+      <div className="goalTitle">{goal.goal}</div>
       <div className="goalNumbers" style={{ right: width }}>
-        {props.goal.current} /{props.goal.end}
+        {goal.current} /{goal.end}
       </div>
       {button ? (
         <div className="goalAdd">

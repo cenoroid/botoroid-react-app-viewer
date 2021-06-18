@@ -1,57 +1,31 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getGoals } from "../store/entities";
+import { getGoals } from "../store/actions";
 import GoalsHeader from "./goals/goalsHeader";
-import Goal from "./goals/goal";
-import ToggleButton from "./toggleButton";
+import GoalsBody from "./goals/goalsBody";
 
-const GoalsContainer = (props) => {
+const GoalsContainer = ({ bind, onSize }) => {
   const dispatch = useDispatch();
   const goals = useSelector((state) => state.entities.goals);
+  const hovering = useSelector((state) => state.appConfig.player.hovering);
   const [show, setShow] = useState(
-    useSelector((state) => state.settings.showContainer.goals)
+    useSelector((state) => state.appConfig.settings.showContainer.goals)
   );
-  let { hovering } = props;
-
-  function handleSize() {
-    props.onSize({
-      width:
-        (100 * document.getElementById("goals").offsetWidth) /
-        window.innerWidth,
-      height:
-        (100 * document.getElementById("goals").offsetHeight) /
-        window.innerHeight,
-    });
-  }
 
   useEffect(() => {
     dispatch(getGoals());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  function handleToggle() {
-    setShow(!show);
-  }
+  }, [dispatch]);
 
   useEffect(() => {
-    handleSize();
-    // eslint-disable-next-line
-  }, [show, hovering, goals]);
+    onSize("goals");
+  }, [show, hovering, goals, onSize]);
 
-  return (
-    <div>
-      {show ||
-        (hovering && (
-          <div>
-            <ToggleButton status={show} onToggle={handleToggle} />
-            <div {...props.bind}>
-              <GoalsHeader />
-            </div>
-          </div>
-        ))}
-      {show && goals.map((goal) => <Goal key={goal.id} goal={goal} />)}
-    </div>
-  );
+  return show || hovering ? (
+    <Fragment>
+      <GoalsHeader show={show} onToggle={() => setShow(!show)} bind={bind} />
+      {show && <GoalsBody />}
+    </Fragment>
+  ) : null;
 };
 
 export default GoalsContainer;

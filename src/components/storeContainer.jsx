@@ -1,81 +1,36 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { getRedemptions } from "../store/entities";
-import Redemption from "./redemptions/redemption";
-import StoreFooter from "./redemptions/storeFooter";
+import { getRedemptions } from "../store/actions";
 import NewRedemption from "./redemptions/newRedemption";
-import ToggleButton from "./toggleButton";
 import StoreHeader from "./redemptions/storeHeader";
+import StoreBody from "./redemptions/storeBody";
+import StoreFooter from "./redemptions/storeFooter";
 
-const StoreContainer = (props) => {
+const StoreContainer = ({ bind, onSize }) => {
   const dispatch = useDispatch();
-  const redemptions = useSelector((state) => state.entities.redemptions);
+  const redemptions = useSelector(({ entities }) => entities.redemptions);
+  const hovering = useSelector(({ appConfig }) => appConfig.player.hovering);
   const [show, setShow] = useState(
-    useSelector((state) => state.settings.showContainer.store)
+    useSelector(({ appConfig }) => appConfig.settings.showContainer.store)
   );
   const [newRedemption, setNewRedemption] = useState(null);
-  let { hovering } = props;
 
   useEffect(() => {
     dispatch(getRedemptions());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
-    handleSize();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [show, hovering, newRedemption, redemptions]);
+    onSize("store");
+  }, [show, hovering, newRedemption, redemptions, onSize]);
 
-  function handleSize() {
-    props.onSize({
-      width:
-        (100 * document.getElementById("store").offsetWidth) /
-        window.innerWidth,
-      height:
-        (100 * document.getElementById("store").offsetHeight) /
-        window.innerHeight,
-    });
-  }
-
-  function handleToggle() {
-    setShow(!show);
-  }
-
-  return (
-    <div>
-      {newRedemption !== null ? (
-        <NewRedemption
-          newRedemption={newRedemption}
-          onRedeem={setNewRedemption}
-        />
-      ) : show ? (
-        <div>
-          <ToggleButton status={show} onToggle={handleToggle} />
-          <div {...props.bind}>
-            <StoreHeader />
-          </div>
-          <div className="redemptionsContainer">
-            {redemptions.map((redemption) => (
-              <Redemption
-                key={redemption.id}
-                redemption={redemption}
-                onRedeem={setNewRedemption}
-              />
-            ))}
-          </div>
-        </div>
-      ) : (
-        props.hovering && (
-          <div>
-            <ToggleButton status={show} onToggle={handleToggle} />
-            <div {...props.bind}>
-              <StoreHeader />
-            </div>
-          </div>
-        )
-      )}
-      {props.hovering || (show && <StoreFooter />)}
-    </div>
-  );
+  return newRedemption !== null ? (
+    <NewRedemption newRedemption={newRedemption} onRedeem={setNewRedemption} />
+  ) : show || hovering ? (
+    <Fragment>
+      <StoreHeader show={show} onToggle={() => setShow(!show)} bind={bind} />
+      <StoreBody show={show} onRedeem={setNewRedemption} />
+      <StoreFooter />
+    </Fragment>
+  ) : null;
 };
 export default StoreContainer;

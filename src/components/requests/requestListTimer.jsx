@@ -1,31 +1,47 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { setTimer, getTimer, setTimerRunning } from "../../store/timer";
+import { setTimer, setTimerRunning } from "../../store/appConfig";
+import { getTimer } from "./../../store/actions";
 
-const RequestListTimer = () => {
+const RequestListTimer = ({ show }) => {
   const dispatch = useDispatch();
-  const timer = useSelector((state) => state.timer.timer);
-  const timerRunning = useSelector((state) => state.timer.timerRunning);
+  const { remaining, running: timerRunning } = useSelector(
+    (state) => state.appConfig.timer
+  );
+  const [timer, setCurrentTimer] = useState();
+  const timeout = useRef();
+  const currentTimer = useRef();
 
   useEffect(() => {
     dispatch(getTimer());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    return () => {
+      currentTimer.current && dispatch(setTimer(currentTimer.current));
+    };
+  }, [dispatch]);
 
   useEffect(() => {
-    if (timer > 0) {
-      if (timerRunning) {
-        let lastUpdate = Date.now();
-        setTimeout(() => {
-          let now = Date.now();
-          let deltaTime = now - lastUpdate;
-          console.log(deltaTime);
-          dispatch(setTimer(deltaTime));
-        }, 200);
+    setCurrentTimer(remaining);
+  }, [remaining]);
+
+  useEffect(() => {
+    if (!timerRunning || timer <= 0) return;
+
+    let lastUpdate = Date.now();
+    timeout.current = setTimeout(() => {
+      const now = Date.now();
+      const deltaTime = now - lastUpdate;
+      const newTime = timer - deltaTime / 1000;
+      if (newTime <= 0) {
+        return dispatch(setTimerRunning(false));
       }
-    } else dispatch(setTimerRunning(false));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [timer, timerRunning]);
+      setCurrentTimer(newTime);
+      currentTimer.current = timer;
+    }, 200);
+
+    return () => {
+      clearTimeout(timeout.current);
+    };
+  }, [timer, timerRunning, dispatch]);
 
   function timerConvert() {
     let minutes = Math.floor(timer / 60);
@@ -39,7 +55,7 @@ const RequestListTimer = () => {
     return minutes + "m" + seconds + "s";
   }
 
-  return <div className="requestListTimer">{timerConvert()}</div>;
+  return show ? <div className="requestListTimer">{timerConvert()}</div> : null;
 };
 
 export default RequestListTimer;

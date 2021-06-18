@@ -1,7 +1,13 @@
 import React from "react";
+import ToggleButton from "../common/toggleButton";
 
-const StoreHeader = () => {
-  return <div className="storeHeader">Store</div>;
+const StoreHeader = ({ show, bind, onToggle }) => {
+  return (
+    <div className="storeHeader" id="store" {...bind}>
+      <ToggleButton status={show} onToggle={onToggle} />
+      Store
+    </div>
+  );
 };
 
 export default StoreHeader;

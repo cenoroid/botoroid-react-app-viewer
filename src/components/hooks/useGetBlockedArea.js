@@ -30,12 +30,13 @@ export const useGetBlockedArea = () => {
   const mouseClick = useRef();
   const posOnBump = useRef({ x: 0, y: 0 });
   const mousePos = useRef({ x: 0, y: 0 });
-  const finPos = useRef({});
+  const finPos = useRef();
   const [screenDimensions, setScreenDimensions] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     const oldBlockedArea = blockedArea.current;
     blockedArea.current = { ...oldBlockedArea, screen: screenBlockedArea };
+    console.log("checking");
     setCheckForCol(true);
   }, [screenBlockedArea]);
 
@@ -60,6 +61,7 @@ export const useGetBlockedArea = () => {
   }, []);
 
   function updateBlockedArea(key) {
+    console.log(key);
     const oldBlockedArea = blockedArea.current[key];
     blockedArea.current[key] = {
       ...oldBlockedArea,
@@ -71,8 +73,10 @@ export const useGetBlockedArea = () => {
   }
 
   const setPositionContainer = useCallback((obj) => {
+    finPos.current = false;
     const oldPos = pos.current;
     pos.current = { ...oldPos, ...obj };
+    console.log(obj);
     updateBlockedArea(Object.keys(obj)[0]);
     setNewPos((prev) => ({ ...prev, ...obj }));
     setCheckForCol(true);
@@ -324,7 +328,8 @@ export const useGetBlockedArea = () => {
       e.stopPropagation();
       e.preventDefault();
       if (!isDragging) return;
-      setPositionContainer(finPos.current);
+      console.log(finPos.current);
+      if (finPos.current) setPositionContainer(finPos.current);
       setIsDragging(false);
     },
     [isDragging, setPositionContainer]

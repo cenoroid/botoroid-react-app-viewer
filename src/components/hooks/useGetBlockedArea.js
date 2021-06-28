@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
 import _ from "lodash";
-import UseGetSize from "./useGetSize";
 
 export const useGetBlockedArea = () => {
   const screenBlockedArea = useSelector(
@@ -14,15 +13,8 @@ export const useGetBlockedArea = () => {
   });
   const blockedArea = useRef({
     screen: screenBlockedArea,
-    store: { x: 0, y: 12 + screenBlockedArea.top },
-    requestList: { x: 0, y: screenBlockedArea.top },
-    goals: { x: 0, y: 1 + screenBlockedArea.top },
   });
-  const pos = useRef({
-    store: { x: 0, y: 10 + screenBlockedArea.top },
-    requestList: { x: 0, y: screenBlockedArea.top },
-    goals: { x: 0, y: 5 + screenBlockedArea.top },
-  });
+  const pos = useRef({});
   const [isDragging, setIsDragging] = useState(false);
   const [checkForCol, setCheckForCol] = useState(false);
   const posTemp = useRef([]);
@@ -32,37 +24,48 @@ export const useGetBlockedArea = () => {
   const mousePos = useRef({ x: 0, y: 0 });
   const finPos = useRef();
   const [screenDimensions, setScreenDimensions] = useState({ x: 0, y: 0 });
+  const myObserver = useRef(
+    new ResizeObserver((entries) => {
+      const { innerWidth, innerHeight } = window;
+      function convertWidth(width) {
+        return (100 * width) / innerWidth;
+      }
+      function convertHeight(height) {
+        return (100 * height) / innerHeight;
+      }
+      entries.forEach((entry) => {
+        const width = convertWidth(entry.contentRect.width);
+        const height = convertHeight(entry.contentRect.height);
+        const startX = pos.current[entry.target.id].x;
+        const endX = width + startX;
+        const startY = pos.current[entry.target.id].y;
+        const endY = height + startY;
+        const obj = { width, height, startX, endX, startY, endY };
+
+        const oldBlockedArea = { ...blockedArea.current };
+        blockedArea.current = { ...oldBlockedArea, [entry.target.id]: obj };
+
+        setCheckForCol(true);
+      });
+    })
+  );
 
   useEffect(() => {
-    const oldBlockedArea = blockedArea.current;
+    const oldBlockedArea = { ...blockedArea.current };
     blockedArea.current = { ...oldBlockedArea, screen: screenBlockedArea };
-    console.log("checking");
+
     setCheckForCol(true);
   }, [screenBlockedArea]);
 
   const setSize = useCallback((container) => {
-    const obj = {};
-    const size = UseGetSize(container);
-    size.startX = pos.current[container].x;
-    size.endX = size.width + pos.current[container].x;
-    size.startY = pos.current[container].y;
-    size.endY = size.height + pos.current[container].y;
-    if (!_.isEqualWith(size, blockedArea.current[container])) {
-      obj[container] = size;
-    }
+    let element = document.getElementById(container);
+    pos.current[container] = { x: 0, y: blockedArea.current.screen.top };
 
-    if (Object.keys(obj).length !== 0) {
-      const oldBlockedArea = blockedArea.current;
-      blockedArea.current = { ...oldBlockedArea, ...obj };
-      console.log(blockedArea.current);
-
-      setCheckForCol(true);
-    }
+    myObserver.current.observe(element);
   }, []);
 
   function updateBlockedArea(key) {
-    console.log(key);
-    const oldBlockedArea = blockedArea.current[key];
+    const oldBlockedArea = { ...blockedArea.current[key] };
     blockedArea.current[key] = {
       ...oldBlockedArea,
       startX: pos.current[key].x,
@@ -74,20 +77,22 @@ export const useGetBlockedArea = () => {
 
   const setPositionContainer = useCallback((obj) => {
     finPos.current = false;
-    const oldPos = pos.current;
+    const oldPos = { ...pos.current };
     pos.current = { ...oldPos, ...obj };
-    console.log(obj);
+
     updateBlockedArea(Object.keys(obj)[0]);
     setNewPos((prev) => ({ ...prev, ...obj }));
     setCheckForCol(true);
   }, []);
 
   useEffect(() => {
+    if (Object.keys(newPos).length === 0) return;
     Object.keys(newPos).forEach((key) => {
       document.getElementById(
         key
       ).style.transform = `translate(${newPos[key].x}vw, ${newPos[key].y}vh)`;
     });
+    setNewPos({});
   }, [newPos]);
 
   useEffect(() => {
@@ -111,7 +116,9 @@ export const useGetBlockedArea = () => {
 
     function handleColission() {
       const topResult = checkTopColission(); // return key if colission else undefined
-      const zones = Object.keys(pos.current);
+      const zones = Object.keys(blockedArea.current).filter(
+        (key) => key !== "screen"
+      );
       const colissionResult = zones //return array with array or empty
         .map((zone) => {
           const containersAttached = Object.values(attached.current);
@@ -178,7 +185,7 @@ export const useGetBlockedArea = () => {
           return;
         }
 
-        const oldAttached = attached.current;
+        const oldAttached = { ...attached.current };
         attached.current = { ...oldAttached, [zone]: key };
         pos.current[key] = {
           y: blockedArea.current[zone].endY + 1,
@@ -196,7 +203,9 @@ export const useGetBlockedArea = () => {
     }
 
     function checkBottomColission() {
-      const zones = Object.keys(pos.current);
+      const zones = Object.keys(blockedArea.current).filter(
+        (key) => key !== "screen"
+      );
       const result = zones
         .map((key) => {
           if (
@@ -267,10 +276,15 @@ export const useGetBlockedArea = () => {
     }
 
     function checkTopColission() {
-      const zones = Object.keys(pos.current);
+      const zones = Object.keys(blockedArea.current).filter(
+        (key) => key !== "screen"
+      );
+
       const result = zones
         .map((key) => {
-          if (pos.current[key].y < blockedArea.current.screen.top) {
+          if (
+            blockedArea.current[key].startY < blockedArea.current.screen.top
+          ) {
             pos.current[key] = {
               x: blockedArea.current[key].startX,
               y: blockedArea.current.screen.top + 1,
@@ -294,14 +308,16 @@ export const useGetBlockedArea = () => {
     const x = Math.floor(
       Math.random() *
         (blockedArea.current.screen.right -
-          width +
-          blockedArea.current.screen.left)
+          width -
+          blockedArea.current.screen.left) +
+        blockedArea.current.screen.left
     );
     const y = Math.floor(
       Math.random() *
         (blockedArea.current.screen.bottom -
-          height +
-          blockedArea.current.screen.top)
+          height -
+          blockedArea.current.screen.top) +
+        blockedArea.current.screen.top
     );
 
     const chest = {
@@ -311,13 +327,15 @@ export const useGetBlockedArea = () => {
       endY: y + height,
     };
 
-    const checkPos = Object.keys(pos.current).some(
-      (container) =>
-        chest.endX > blockedArea.current[container].startX &&
-        chest.startX < blockedArea.current[container].endX &&
-        chest.startY < blockedArea.current[container].endY &&
-        chest.endY > blockedArea.current[container].startY
-    );
+    const checkPos = Object.keys(blockedArea.current)
+      .filter((key) => key !== "screen")
+      .some(
+        (container) =>
+          chest.endX > blockedArea.current[container].startX &&
+          chest.startX < blockedArea.current[container].endX &&
+          chest.startY < blockedArea.current[container].endY &&
+          chest.endY > blockedArea.current[container].startY
+      );
 
     if (!checkPos) return { x, y };
     return chestPos(width, height);
@@ -328,7 +346,7 @@ export const useGetBlockedArea = () => {
       e.stopPropagation();
       e.preventDefault();
       if (!isDragging) return;
-      console.log(finPos.current);
+
       if (finPos.current) setPositionContainer(finPos.current);
       setIsDragging(false);
     },

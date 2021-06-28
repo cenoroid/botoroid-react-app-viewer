@@ -14,12 +14,18 @@ const App = () => {
   );
   useEffect(() => {
     dispatch(initApp());
-  }, [dispatch]);
+    window.addEventListener("resize", windowResize);
 
-  window.Twitch.ext.onContext(({ displayResolution }, e) => {
-    if (e.includes("displayResolution"))
-      dispatch(displayUpdated({ displayResolution }));
-  });
+    window.Twitch.ext.onContext(({ displayResolution }, update) => {
+      if (update.includes("displayResolution"))
+        dispatch(displayUpdated({ displayResolution }));
+    });
+
+    function windowResize() {
+      window.removeEventListener("resize", windowResize);
+      dispatch(displayUpdated({ screenInit: true }));
+    }
+  }, [dispatch]);
 
   return userData.linked && settingsLoaded ? (
     <div

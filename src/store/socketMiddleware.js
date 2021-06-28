@@ -2,7 +2,7 @@ import io from "socket.io-client";
 import { requestsUpdated, redemptionsUpdated, goalsUpdated } from "./entities";
 import { currencyUpdated } from "./auth";
 import { settingsUpdated } from "./appConfig";
-import { initTimer, setTimerRunning, setTimer } from "./appConfig";
+import { initTimer, setTimerRunning } from "./appConfig";
 import { loginRequest } from "./actions";
 
 const api = process.env.REACT_APP_API;
@@ -15,45 +15,37 @@ const websocket =
   async (action) => {
     if (action.type === "initApp") {
       socket.emit("getsettings");
+      dispatch(loginRequest({ socket, url: api }));
       if (!listener.getsettings) {
         listener.getsettings = true;
-        socket.on("getsettings", (data) => {
-          dispatch(settingsUpdated(data));
-        });
+        socket.on("getsettings", (data) => dispatch(settingsUpdated(data)));
       }
-      dispatch(loginRequest({ socket, url: api }));
       if (!listener.updatecurrency) {
         listener.updatecurrency = true;
-        socket.on("updatecurrency", (data) => {
-          dispatch(currencyUpdated(data));
-        });
+        socket.on("updatecurrency", (data) => dispatch(currencyUpdated(data)));
       }
     }
     if (action.type === "entities/getRequests") {
       socket.emit("getrequests");
       if (!listener.getrequests) {
         listener.getrequests = true;
-        socket.on("getrequests", (data) => {
-          dispatch(requestsUpdated(data));
-        });
+        socket.on("getrequests", (data) => dispatch(requestsUpdated(data)));
       }
     }
     if (action.type === "entities/getGoals") {
       socket.emit("getgoals");
       if (!listener.getgoals) {
         listener.getgoals = true;
-        socket.on("getgoals", (data) => {
-          dispatch(goalsUpdated(data));
-        });
+        socket.on("getgoals", (data) => dispatch(goalsUpdated(data)));
       }
     }
     if (action.type === "entities/getRedemptions") {
       socket.emit("getredemptions");
       if (!listener.getredemptions) {
         listener.getredemptions = true;
-        socket.on("getredemptions", (data) => {
-          dispatch(redemptionsUpdated(data));
-        });
+        socket.on("getredemptions", (data) =>
+          dispatch(redemptionsUpdated(data))
+        );
       }
     }
     if (action.type === "entities/addRequest") {
@@ -71,24 +63,17 @@ const websocket =
         socket.emit("goalupdate", data);
       }
     }
-
     if (action.type === "appConfig/getTimer") {
-      if (!getState().appConfig.timer.initialized) {
-        socket.emit("gettimer");
-      } else dispatch(setTimer({ resumed: Date.now() }));
+      socket.emit("gettimer");
       if (!listener.gettimer) {
         listener.gettimer = true;
         socket.on("starttimer", (timer, timerRunning) => {
-          if (timer > 0) {
-            dispatch(initTimer({ timer, timerRunning }));
-          }
+          if (timer > 0) dispatch(initTimer({ timer, timerRunning }));
         });
-        socket.on("pausetimer", () => {
-          dispatch(setTimerRunning("toggle"));
-        });
-        socket.on("stoptimer", () => {
-          dispatch(initTimer({ timer: 0, timerRunning: false }));
-        });
+        socket.on("pausetimer", () => dispatch(setTimerRunning("toggle")));
+        socket.on("stoptimer", () =>
+          dispatch(initTimer({ timer: 0, timerRunning: false }))
+        );
       }
     }
     if (action.type === "chestClicked") {

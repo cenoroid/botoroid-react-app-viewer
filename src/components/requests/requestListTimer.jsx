@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { setTimer, setTimerRunning } from "../../store/appConfig";
+import { setTimerRunning } from "../../store/appConfig";
 import { getTimer } from "./../../store/actions";
 
 const RequestListTimer = ({ show }) => {
@@ -10,13 +10,9 @@ const RequestListTimer = ({ show }) => {
   );
   const [timer, setCurrentTimer] = useState();
   const timeout = useRef();
-  const currentTimer = useRef();
 
   useEffect(() => {
     dispatch(getTimer());
-    return () => {
-      currentTimer.current && dispatch(setTimer(currentTimer.current));
-    };
   }, [dispatch]);
 
   useEffect(() => {
@@ -30,12 +26,12 @@ const RequestListTimer = ({ show }) => {
     timeout.current = setTimeout(() => {
       const now = Date.now();
       const deltaTime = now - lastUpdate;
-      const newTime = timer - deltaTime / 1000;
+      let newTime = timer - deltaTime / 1000;
       if (newTime <= 0) {
+        newTime = 0;
         return dispatch(setTimerRunning(false));
       }
       setCurrentTimer(newTime);
-      currentTimer.current = timer;
     }, 200);
 
     return () => {

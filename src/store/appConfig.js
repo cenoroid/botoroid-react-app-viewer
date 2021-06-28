@@ -8,37 +8,32 @@ const slice = createSlice({
       chests: { width: 2, height: 3.5 },
       loaded: false,
     },
-    timer: { remaining: 0, running: false, initialized: false, paused: 0 },
+    timer: { remaining: 0, running: false, initialized: false, paused: null },
     player: {
-      hovering: true,
-      displayResolution: "0x0",
+      hovering: false,
+      displayResolution: null,
       screenBlockedArea: { top: 10, left: 0, right: 98, bottom: 98 },
     },
+    screenInit: false,
   },
   reducers: {
     initTimer: (state, action) => {
-      if (!state.timer.initialized) {
-        state.timer.initialized = true;
-      }
+      if (!state.timer.initialized) state.timer.initialized = true;
+
       const { timer, timerRunning } = action.payload;
       state.timer.remaining = timer;
       state.timer.running = timerRunning;
     },
-    setTimer: (state, action) => {
-      if (action.payload.resumed) {
-        const { resumed } = action.payload;
-        let deltaTime = (resumed - state.timer.paused) / 1000;
-        state.timer.remaining = state.timer.remaining - deltaTime;
-      } else {
-        state.timer.remaining = action.payload;
-
-        state.timer.paused = Date.now();
-      }
-      if (state.timer.remaining < 0) state.timer.remaining = 0;
-    },
-
     setTimerRunning: (state, action) => {
       if (action.payload === "toggle") {
+        if (state.timer.paused) {
+          if (state.timer.running) {
+            state.timer.remaining =
+              state.timer.remaining - (Date.now() - state.timer.paused) / 1000;
+          } else {
+            state.timer.paused = Date.now();
+          }
+        }
         state.timer.running = !state.timer.running;
       } else state.timer.running = action.payload;
     },
@@ -52,25 +47,28 @@ const slice = createSlice({
 
     hoverUpdated: (state, action) => {
       const { visible } = action.payload;
-      if (visible && !state.player.hovering) {
-        console.log("I changed");
-        state.player.hovering = true;
-      } else if (!visible && state.player.hovering) {
-        state.player.hovering = false;
-      }
+      if (visible && !state.player.hovering) state.player.hovering = true;
+      else if (!visible && state.player.hovering) state.player.hovering = false;
     },
     displayUpdated: (state, action) => {
-      const { displayResolution } = action.payload;
-      if (displayResolution !== state.player.displayResolution) {
+      const { displayResolution, screenInit } = action.payload;
+
+      if (screenInit) {
+        if (state.screenInit) return;
+        state.screenInit = true;
+      }
+
+      if (displayResolution) {
         state.player.displayResolution = displayResolution;
-        const parts = displayResolution.split("x");
+      }
+
+      if (state.player.displayResolution && state.screenInit) {
+        const parts = state.player.displayResolution.split("x");
         const player = { width: Number(parts[0]), height: Number(parts[1]) };
-        const { innerWidth, innerHeight } = window;
-        const screen = { width: innerWidth, height: innerHeight };
+        const screen = { width: window.innerWidth, height: window.innerHeight };
         const widthDist = player.width - screen.width;
         const heightDist = player.height - screen.height;
-        console.log("height", screen.height);
-        console.log(heightDist);
+
         state.player.screenBlockedArea.top =
           heightDist > player.height / 10
             ? 0
@@ -81,10 +79,6 @@ const slice = createSlice({
           widthDist < 160
             ? 99 - (100 * (160 - widthDist)) / (screen.width * 2)
             : 99;
-
-        console.log("right", state.player.screenBlockedArea.right);
-        console.log("widthDist", widthDist);
-        console.log("player", player.width);
       }
     },
   },

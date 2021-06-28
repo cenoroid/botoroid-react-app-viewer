@@ -7,7 +7,7 @@ import treasureChest from "./media/treasure.png";
 const Chests = ({ chestPos }) => {
   const dispatch = useDispatch();
   const [show, setShow] = useState(false);
-  const [display, setDisplay] = useState(true);
+  const [clicked, setClicked] = useState(true);
   const chests = useSelector((state) => state.appConfig.settings.chests);
   const timeout = useRef();
   const transitionButton = useSpring({
@@ -28,19 +28,18 @@ const Chests = ({ chestPos }) => {
       newPos.current = chestPos(chests.width, chests.height);
       timeout.current = setTimeout(() => {
         setShow(true);
-        setDisplay(true);
+        setClicked(true);
       }, Math.floor(Math.random() * (chests.max - chests.min) * 60000 + chests.min * 60000));
     }
   }, [show, chests, chestPos]);
 
   function handleChest() {
-    if (show) {
-      clearTimeout(timeout.current);
-      timeout.current = setTimeout(() => {
-        setShow(false);
-      }, 2000);
-    }
-    setDisplay(false);
+    if (!show) return;
+    clearTimeout(timeout.current);
+    timeout.current = setTimeout(() => {
+      setShow(false);
+    }, 2000);
+    setClicked(false);
     dispatch(chestClicked());
   }
 
@@ -54,7 +53,7 @@ const Chests = ({ chestPos }) => {
         fontSize: chests.height / 2 + "vh",
       }}
     >
-      {display ? (
+      {clicked ? (
         <animated.button
           style={transitionButton}
           className="chestButton"

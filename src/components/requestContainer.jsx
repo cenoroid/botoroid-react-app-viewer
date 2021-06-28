@@ -12,15 +12,11 @@ const RequestContainer = ({ bind, onSize }) => {
   );
   const hovering = useSelector((state) => state.appConfig.player.hovering);
   const [expand, setExpand] = useState(true);
-  const requests = useSelector((state) => state.entities.requests);
 
   useEffect(() => {
     dispatch(getRequests());
-  }, [dispatch]);
-
-  useEffect(() => {
     onSize("requestList");
-  }, [show, expand, hovering, requests, onSize]);
+  }, [dispatch, onSize]);
 
   return show || hovering ? (
     <Fragment>
@@ -32,11 +28,7 @@ const RequestContainer = ({ bind, onSize }) => {
 
       {show && (
         <Fragment>
-          <RequestListBody
-            requests={requests}
-            onHover={() => onSize("requestList")}
-            expand={expand}
-          />
+          <RequestListBody expand={expand} />
           <RequestListFooter
             onExpand={() => setExpand(!expand)}
             expand={expand}

@@ -35,9 +35,5 @@ User can:
 
 ## v0.0.3
 
-- [] reuse grantaccesstoggle to open/close store
-  add settings in store
-  reset UI button
-- [] error message, when not enough cbucks
-- [] try react use gesture for drag
-- [?] make goals resizable
+- optimizations of dragging containers
+- bugfix on timer

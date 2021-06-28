@@ -8,7 +8,6 @@ import StoreFooter from "./redemptions/storeFooter";
 
 const StoreContainer = ({ bind, onSize }) => {
   const dispatch = useDispatch();
-  const redemptions = useSelector(({ entities }) => entities.redemptions);
   const hovering = useSelector(({ appConfig }) => appConfig.player.hovering);
   const [show, setShow] = useState(
     useSelector(({ appConfig }) => appConfig.settings.showContainer.store)
@@ -17,11 +16,8 @@ const StoreContainer = ({ bind, onSize }) => {
 
   useEffect(() => {
     dispatch(getRedemptions());
-  }, [dispatch]);
-
-  useEffect(() => {
     onSize("store");
-  }, [show, hovering, newRedemption, redemptions, onSize]);
+  }, [dispatch, onSize]);
 
   return newRedemption !== null ? (
     <NewRedemption newRedemption={newRedemption} onRedeem={setNewRedemption} />

@@ -3,7 +3,7 @@ import youtubeIconImport from "../media/youtubeicon.png";
 import greyYoutubeIconImport from "../media/greyyoutubeicon.png";
 import gameIconImport from "../media/xboxicon.png";
 
-const Request = ({ request, onHover }) => {
+const Request = ({ request }) => {
   function defineIcon() {
     const { subtype } = request;
     if (subtype === "game request") {
@@ -16,12 +16,7 @@ const Request = ({ request, onHover }) => {
   }
 
   return (
-    <div
-      className="request"
-      id={"id" + request.id}
-      onMouseOver={onHover}
-      onMouseOut={onHover}
-    >
+    <div className="request" id={"id" + request.id}>
       <div className="requestMessage">
         {request.id}.{" "}
         <img
